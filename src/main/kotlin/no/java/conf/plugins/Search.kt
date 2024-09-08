@@ -10,14 +10,19 @@ import io.ktor.server.routing.get
 import io.ktor.server.routing.routing
 import no.java.conf.service.SearchService
 
-fun Application.searchClient() = SearchClient(
-    KtorRestClient(
-        host = environment.config.property("elastic.host").getString(),
-        port = environment.config.property("elastic.port").getString().toInt(),
-        user = environment.config.property("elastic.username").getString(),
-        password = environment.config.property("elastic.password").getString()
+fun Application.searchClient() =
+    SearchClient(
+        KtorRestClient(
+            host = environment.config.property("elastic.host").getString(),
+            port =
+                environment.config
+                    .property("elastic.port")
+                    .getString()
+                    .toInt(),
+            user = environment.config.property("elastic.username").getString(),
+            password = environment.config.property("elastic.password").getString(),
+        ),
     )
-)
 
 fun Application.searchService() = SearchService(client = searchClient())
 

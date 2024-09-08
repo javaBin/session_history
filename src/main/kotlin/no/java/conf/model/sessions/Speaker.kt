@@ -6,5 +6,5 @@ import kotlinx.serialization.Serializable
 data class Speaker(
     val name: String,
     val twitter: String?,
-    val bio: String?
+    val bio: String?,
 )

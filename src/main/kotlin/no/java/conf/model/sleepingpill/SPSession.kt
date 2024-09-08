@@ -28,19 +28,20 @@ data class SPSession(
     val workshopPrerequisites: String?,
 )
 
-fun SPSession.toSession(year: Int) = Session(
-    intendedAudience = this.intendedAudience,
-    length = length?.toInt(),
-    format = Format.fromCode(this.format),
-    language = Language.fromCode(this.language),
-    abstract = this.abstract,
-    title = this.title,
-    video = this.video?.fixVideo(),
-    id = this.id,
-    sessionId = this.sessionId,
-    conferenceId = this.conferenceId,
-    speakers = this.speakers.map(SPSpeaker::toSpeaker),
-    year = year
-)
+fun SPSession.toSession(year: Int) =
+    Session(
+        intendedAudience = this.intendedAudience,
+        length = length?.toInt(),
+        format = Format.fromCode(this.format),
+        language = Language.fromCode(this.language),
+        abstract = this.abstract,
+        title = this.title,
+        video = this.video?.fixVideo(),
+        id = this.id,
+        sessionId = this.sessionId,
+        conferenceId = this.conferenceId,
+        speakers = this.speakers.map(SPSpeaker::toSpeaker),
+        year = year,
+    )
 
 fun String.fixVideo() = "https://vimeo.com/" + this.split("/").last()

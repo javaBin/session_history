@@ -6,5 +6,5 @@ import kotlinx.serialization.Serializable
 data class VideoSearchResult(
     val title: String,
     val video: String,
-    val year: Int
+    val year: Int,
 )

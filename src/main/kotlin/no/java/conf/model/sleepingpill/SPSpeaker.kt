@@ -10,8 +10,9 @@ data class SPSpeaker(
     val bio: String?,
 )
 
-fun SPSpeaker.toSpeaker() = Speaker(
-    name = this.name,
-    twitter = this.twitter,
-    bio = this.bio
-)
+fun SPSpeaker.toSpeaker() =
+    Speaker(
+        name = this.name,
+        twitter = this.twitter,
+        bio = this.bio,
+    )

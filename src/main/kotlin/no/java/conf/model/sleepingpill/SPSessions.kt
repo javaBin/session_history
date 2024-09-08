@@ -4,5 +4,5 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class SPSessions(
-    val sessions: List<SPSession>
+    val sessions: List<SPSession>,
 )

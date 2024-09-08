@@ -13,7 +13,6 @@ import com.jillesvangurp.ktsearch.createIndex
 import com.jillesvangurp.ktsearch.deleteIndex
 import com.jillesvangurp.ktsearch.parseHits
 import com.jillesvangurp.ktsearch.search
-import com.jillesvangurp.searchdsls.querydsl.bool
 import com.jillesvangurp.searchdsls.querydsl.exists
 import com.jillesvangurp.serializationext.DEFAULT_JSON
 import io.github.oshai.kotlinlogging.KotlinLogging
@@ -27,15 +26,21 @@ import kotlin.time.measureTimedValue
 
 private const val INDEX_NAME = "javazone"
 
+private const val REPLICAS = 0
+private const val SHARDS = 3
+private const val REFRESH = 10
+
 private val logger = KotlinLogging.logger {}
 
 enum class State {
     NEW,
     MAPPED,
-    INDEXED
+    INDEXED,
 }
 
-class SearchService(private val client: SearchClient) {
+class SearchService(
+    private val client: SearchClient,
+) {
     private var readyState = State.NEW
 
     suspend fun setup() {
@@ -47,9 +52,9 @@ class SearchService(private val client: SearchClient) {
 
         client.createIndex(INDEX_NAME) {
             settings {
-                replicas = 0
-                shards = 3
-                refreshInterval = 10.seconds
+                replicas = REPLICAS
+                shards = SHARDS
+                refreshInterval = REFRESH.seconds
             }
             mappings(dynamicEnabled = false) {
                 text(Session::title)
@@ -75,31 +80,44 @@ class SearchService(private val client: SearchClient) {
             return
         }
 
-        val itemCallBack = object : BulkItemCallBack {
-            override fun bulkRequestFailed(e: Exception, ops: List<Pair<String, String?>>) {
-                logger.error(e) { "Bulk failed" }
-            }
+        val itemCallBack =
+            object : BulkItemCallBack {
+                override fun bulkRequestFailed(
+                    e: Exception,
+                    ops: List<Pair<String, String?>>,
+                ) {
+                    logger.error(e) { "Bulk failed" }
+                }
 
-            override fun itemFailed(operationType: OperationType, item: BulkResponse.ItemDetails) {
-                logger.warn { "${operationType.name} failed  ${item.id} with ${item.status}" }
-            }
+                override fun itemFailed(
+                    opType: OperationType,
+                    item: BulkResponse.ItemDetails,
+                ) {
+                    logger.warn { "${opType.name} failed ${item.id} with ${item.status}" }
+                }
 
-            override fun itemOk(operationType: OperationType, item: BulkResponse.ItemDetails) {
-                logger.trace { "operation $operationType completed - id: ${item.id} - sq_no: ${item.seqNo} - primary_term ${item.primaryTerm}" }
-            }
-        }
-
-        val timeTaken = measureTimedValue {
-            client.bulk(callBack = itemCallBack) {
-                sessions.forEach { session ->
-                    index(
-                        source = DEFAULT_JSON.encodeToString(Session.serializer(), session),
-                        index = INDEX_NAME,
-                        id = session.sessionId
-                    )
+                override fun itemOk(
+                    opType: OperationType,
+                    item: BulkResponse.ItemDetails,
+                ) {
+                    logger.trace {
+                        "${opType.name} completed ${item.id} seq ${item.seqNo} primary_term ${item.primaryTerm}"
+                    }
                 }
             }
-        }
+
+        val timeTaken =
+            measureTimedValue {
+                client.bulk(callBack = itemCallBack) {
+                    sessions.forEach { session ->
+                        index(
+                            source = DEFAULT_JSON.encodeToString(Session.serializer(), session),
+                            index = INDEX_NAME,
+                            id = session.sessionId,
+                        )
+                    }
+                }
+            }
 
         logger.info { "Time taken to index - $timeTaken" }
 
@@ -114,16 +132,14 @@ class SearchService(private val client: SearchClient) {
 
         val docs = client.count(INDEX_NAME).count
 
-        val sessions: SearchResponse = client.search(INDEX_NAME) {
-            resultSize = docs.toInt()
-            query = exists("video")
-        }
+        val sessions: SearchResponse =
+            client.search(INDEX_NAME) {
+                resultSize = docs.toInt()
+                query = exists("video")
+            }
 
         return sessions.parseHits<VideoSearchResult>()
     }
 
-    fun state(): State {
-        return readyState
-    }
-
+    fun state(): State = readyState
 }
