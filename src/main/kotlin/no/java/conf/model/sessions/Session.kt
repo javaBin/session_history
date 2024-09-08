@@ -1,5 +1,8 @@
 package no.java.conf.model.sessions
 
+import kotlinx.serialization.Serializable
+
+@Serializable
 data class Session(
     val intendedAudience: String?,
     val length: Int?,

@@ -1,5 +1,8 @@
 package no.java.conf.model.sessions
 
+import kotlinx.serialization.Serializable
+
+@Serializable
 enum class Language(private val code: String) {
     EN("en"),
     NO("no"),

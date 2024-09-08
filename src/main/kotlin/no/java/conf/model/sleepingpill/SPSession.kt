@@ -1,13 +1,11 @@
 package no.java.conf.model.sleepingpill
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties
-import no.java.conf.model.EndpointConfig
+import kotlinx.serialization.Serializable
 import no.java.conf.model.sessions.Format
 import no.java.conf.model.sessions.Language
 import no.java.conf.model.sessions.Session
-import no.java.conf.model.sessions.Speaker
 
-@JsonIgnoreProperties(ignoreUnknown = true)
+@Serializable
 data class SPSession(
     val intendedAudience: String?,
     val length: String?,

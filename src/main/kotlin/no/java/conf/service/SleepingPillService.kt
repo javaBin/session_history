@@ -8,6 +8,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import no.java.conf.model.EndpointConfig
 import no.java.conf.model.sessions.Session
@@ -26,29 +27,22 @@ class SleepingPillService(
     private val endpoints: List<EndpointConfig>,
     private val searchService: SearchService
 ) {
+    private lateinit var sessions: List<Session>
 
-    private val sessions: List<Session> by lazy {
-        runBlocking(Dispatchers.IO) {
-            coroutineScope {
-                endpoints.map { endpoint ->
-                    async {
-                        fetchEndpoint(endpoint)
-                    }
-                }.awaitAll().map {
-                    it.sessions.map { session ->
-                        session.toSession(it.year)
-                    }
-                }.flatten()
-            }
-        }
-    }
+    suspend fun retrieve() {
+        coroutineScope {
+            sessions = endpoints.map { endpoint ->
+                async {
+                    fetchEndpoint(endpoint)
+                }
+            }.awaitAll().map {
+                it.sessions.map { session ->
+                    session.toSession(it.year)
+                }
+            }.flatten()
 
-    init {
-        logger.debug { "SleepingPill - endpoints: $endpoints" }
+            logger.debug { "SleepingPill - sessions: ${sessions.count()}" }
 
-        logger.debug { "SleepingPill - sessions: ${sessions.count()}" }
-
-        runBlocking {
             searchService.ingest(sessions)
         }
     }
@@ -59,6 +53,4 @@ class SleepingPillService(
             endpoint.endpoint,
             client.get(endpoint.endpoint).body<SPSessions>().sessions
         )
-
-    fun allVideos() = sessions.filter { it.hasVideo() }
 }

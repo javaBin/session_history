@@ -1,9 +1,9 @@
 package no.java.conf.model.sleepingpill
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties
+import kotlinx.serialization.Serializable
 import no.java.conf.model.sessions.Speaker
 
-@JsonIgnoreProperties(ignoreUnknown = true)
+@Serializable
 data class SPSpeaker(
     val name: String,
     val twitter: String?,

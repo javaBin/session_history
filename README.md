@@ -9,9 +9,16 @@ Development running - user elastic, password elastic.
 
 Start elastic in docker - `docker compose up -d`
 
-Notes - at present - starts with a blocking coroutine to populate - takes about 4 mins on dev laptop.
+Notes - at present - indexing takes about 4 mins on dev laptop. Comment out some endpoints in application.conf if you don't want to wait.
 
-Todo - make it non-blocking with a ready flag - then api calls should return not ready if it isn't done indexing.
+Calls to API will return 503 until the index is ready.
 
-Might fail at startup - if it does - comment out `client.deleteIndex(INDEX_NAME)` on first run (SearchService)
+You can check state with /api/state (searching will only work when state is INDEXED).
 
+## Bruno
+
+REST client for testing.
+
+Available from [Use Bruno](https://www.usebruno.com/)
+
+Import the collection in ./bruno

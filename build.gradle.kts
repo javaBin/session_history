@@ -4,6 +4,7 @@ plugins {
     alias(libs.plugins.kotlinter)
     alias(libs.plugins.detekt)
     alias(libs.plugins.versions)
+    alias(libs.plugins.serialization)
 }
 
 group = "no.java.conf"
