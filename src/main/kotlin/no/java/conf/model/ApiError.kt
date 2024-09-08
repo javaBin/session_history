@@ -10,3 +10,5 @@ sealed class ApiError(
 }
 
 data object IndexNotReady : ApiError(HttpStatusCode.ServiceUnavailable, "Index is not yet available")
+
+data object SearchMissing : ApiError(HttpStatusCode.BadRequest, "Search request missing")

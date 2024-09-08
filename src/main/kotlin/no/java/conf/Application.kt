@@ -10,9 +10,8 @@ import no.java.conf.plugins.configureSearchRouting
 import no.java.conf.plugins.configureSecurity
 import no.java.conf.plugins.configureSerialization
 import no.java.conf.plugins.httpClient
-import no.java.conf.plugins.searchClient
+import no.java.conf.plugins.searchService
 import no.java.conf.plugins.sleepingPillService
-import no.java.conf.service.SearchService
 
 fun main(args: Array<String>) {
     io.ktor.server.cio.EngineMain
@@ -20,8 +19,7 @@ fun main(args: Array<String>) {
 }
 
 fun Application.module() {
-    val searchClient = searchClient()
-    val searchService = SearchService(searchClient)
+    val searchService = searchService()
     val sleepingPillService = sleepingPillService(httpClient(), searchService)
 
     configureSerialization()

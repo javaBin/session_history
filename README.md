@@ -2,7 +2,6 @@
 
 What is this? TBD :)
 
-
 ## Elastic
 
 Development running - user elastic, password elastic.
@@ -22,3 +21,9 @@ REST client for testing.
 Available from [Use Bruno](https://www.usebruno.com/)
 
 Import the collection in ./bruno
+
+## API
+
+* GET /api/search/videos - title, video and year for all sessions that have a video link
+* GET /api/search/state - `NEW`/`MAPPED`/`INDEXED`
+* POST /api/search - `{ "query": "searchString" }` - simple text search (currently nested speaker fields not being searched)
