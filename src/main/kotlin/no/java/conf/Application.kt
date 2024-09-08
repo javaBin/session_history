@@ -20,7 +20,7 @@ fun main(args: Array<String>) {
 
 fun Application.module() {
     val searchService = searchService()
-    val sleepingPillService = sleepingPillService(httpClient(), searchService)
+    val sleepingPillService = sleepingPillService(httpClient())
 
     configureSerialization()
     configureMonitoring()
@@ -32,6 +32,7 @@ fun Application.module() {
 
     scope.launch {
         searchService.setup()
-        sleepingPillService.retrieve()
+        val sessions = sleepingPillService.retrieve()
+        searchService.ingest(sessions)
     }
 }

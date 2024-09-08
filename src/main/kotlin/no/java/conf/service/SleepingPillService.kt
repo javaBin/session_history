@@ -24,35 +24,28 @@ private val logger = KotlinLogging.logger {}
 class SleepingPillService(
     private val client: HttpClient,
     private val endpoints: List<EndpointConfig>,
-    private val searchService: SearchService,
 ) {
     private lateinit var sessions: List<Session>
 
-    suspend fun retrieve() {
-        coroutineScope {
-            sessions =
-                endpoints
-                    .map { endpoint ->
-                        async {
-                            fetchEndpoint(endpoint)
-                        }
-                    }.awaitAll()
-                    .map {
-                        it.sessions.map { session ->
-                            session.toSession(it.year)
-                        }
-                    }.flatten()
-
-            logger.debug { "SleepingPill - sessions: ${sessions.count()}" }
-
-            searchService.ingest(sessions)
+    suspend fun retrieve(): List<Session> {
+       sessions = coroutineScope {
+            endpoints.map { endpoint ->
+                async {
+                    fetchEndpoint(endpoint)
+                }
+            }.awaitAll().map {
+                it.sessions.map { session ->
+                    session.toSession(it.year)
+                }
+            }.flatten().also { logger.debug { "SleepingPill - sessions: ${it.count()}" } }
         }
+
+        return sessions
     }
 
-    private suspend fun fetchEndpoint(endpoint: EndpointConfig) =
-        EndpointSessions(
-            endpoint.year,
-            endpoint.endpoint,
-            client.get(endpoint.endpoint).body<SPSessions>().sessions,
-        )
+    private suspend fun fetchEndpoint(endpoint: EndpointConfig) = EndpointSessions(
+        endpoint.year,
+        endpoint.endpoint,
+        client.get(endpoint.endpoint).body<SPSessions>().sessions,
+    )
 }
