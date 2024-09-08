@@ -21,7 +21,11 @@ data class EndpointSessions(
 
 private val logger = KotlinLogging.logger {}
 
-class SleepingPillService(private val client: HttpClient, private val endpoints: List<EndpointConfig>) {
+class SleepingPillService(
+    private val client: HttpClient,
+    private val endpoints: List<EndpointConfig>,
+    private val searchService: SearchService
+) {
 
     private val sessions: List<Session> by lazy {
         runBlocking(Dispatchers.IO) {
@@ -43,10 +47,18 @@ class SleepingPillService(private val client: HttpClient, private val endpoints:
         logger.debug { "SleepingPill - endpoints: $endpoints" }
 
         logger.debug { "SleepingPill - sessions: ${sessions.count()}" }
+
+        runBlocking {
+            searchService.ingest(sessions)
+        }
     }
 
     private suspend fun fetchEndpoint(endpoint: EndpointConfig) =
-        EndpointSessions(endpoint.year, endpoint.endpoint, client.get(endpoint.endpoint).body<SPSessions>().sessions)
+        EndpointSessions(
+            endpoint.year,
+            endpoint.endpoint,
+            client.get(endpoint.endpoint).body<SPSessions>().sessions
+        )
 
     fun allVideos() = sessions.filter { it.hasVideo() }
 }

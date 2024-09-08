@@ -19,6 +19,11 @@ kotlin {
 
 repositories {
     mavenCentral()
+    maven("https://maven.tryformation.com/releases") {
+        content {
+            includeGroup("com.jillesvangurp")
+        }
+    }
 }
 
 dependencies {
@@ -34,10 +39,10 @@ dependencies {
     implementation(libs.bundles.ktor.client)
     implementation(libs.arrow.core)
     implementation(libs.kotlin.logging)
+    implementation(libs.bundles.search)
     testImplementation(libs.ktor.server.test.host)
     testImplementation(libs.kotlin.test.junit)
 }
-
 
 tasks {
     withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
