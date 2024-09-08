@@ -5,7 +5,7 @@ import no.java.conf.plugins.configureMonitoring
 import no.java.conf.plugins.configureRouting
 import no.java.conf.plugins.configureSecurity
 import no.java.conf.plugins.configureSerialization
-import no.java.conf.plugins.configureServices
+import no.java.conf.plugins.configureSessionRouting
 
 fun main(args: Array<String>) {
     io.ktor.server.cio.EngineMain
@@ -17,5 +17,5 @@ fun Application.module() {
     configureMonitoring()
     configureSecurity()
     configureRouting()
-    configureServices()
+    configureSessionRouting()
 }
