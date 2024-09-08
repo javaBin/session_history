@@ -29,7 +29,7 @@ fun Application.configureMonitoring() {
             listOf(
                 JvmMemoryMetrics(),
                 JvmGcMetrics(),
-                ProcessorMetrics()
+                ProcessorMetrics(),
             )
     }
     install(CallLogging) {

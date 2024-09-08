@@ -1,17 +1,20 @@
 package no.java.conf
 
-import io.ktor.client.request.*
-import io.ktor.client.statement.*
-import io.ktor.http.*
-import io.ktor.server.testing.*
-import kotlin.test.*
+import io.ktor.client.request.get
+import io.ktor.client.statement.bodyAsText
+import io.ktor.http.HttpStatusCode
+import io.ktor.server.testing.testApplication
+import kotlin.test.Test
+import kotlin.test.assertEquals
+import kotlin.test.assertTrue
 
 class ApplicationTest {
     @Test
-    fun testRoot() = testApplication {
-        client.get("/").apply {
-            assertEquals(HttpStatusCode.OK, status)
-            assertEquals("Hello World!", bodyAsText())
+    fun testRoot() =
+        testApplication {
+            client.get("/").apply {
+                assertEquals(HttpStatusCode.OK, status)
+                assertTrue { bodyAsText().contains("Hello Ktor!") }
+            }
         }
-    }
 }

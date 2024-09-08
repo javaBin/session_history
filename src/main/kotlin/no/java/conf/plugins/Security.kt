@@ -13,7 +13,9 @@ import io.ktor.server.sessions.sessions
 import io.ktor.server.sessions.set
 
 fun Application.configureSecurity() {
-    data class MySession(val count: Int = 0)
+    data class MySession(
+        val count: Int = 0,
+    )
 
     install(Sessions) {
         cookie<MySession>("MY_SESSION") {
@@ -22,9 +24,9 @@ fun Application.configureSecurity() {
     }
     routing {
         get("/session/increment") {
-                val session = call.sessions.get<MySession>() ?: MySession()
-                call.sessions.set(session.copy(count = session.count + 1))
-                call.respondText("Counter is ${session.count}. Refresh to increment.")
-            }
+            val session = call.sessions.get<MySession>() ?: MySession()
+            call.sessions.set(session.copy(count = session.count + 1))
+            call.respondText("Counter is ${session.count}. Refresh to increment.")
+        }
     }
 }

@@ -22,19 +22,18 @@ repositories {
 }
 
 dependencies {
-    implementation(libs.ktor.server.content.negotiation)
     implementation(libs.ktor.server.core)
-    implementation(libs.ktor.serialization.jackson)
-    implementation(libs.ktor.server.metrics)
-    implementation(libs.ktor.server.metrics.micrometer)
-    implementation(libs.micrometer.registry.prometheus)
-    implementation(libs.ktor.server.call.logging)
-    implementation(libs.ktor.server.call.id)
     implementation(libs.ktor.server.host.common)
     implementation(libs.ktor.server.status.pages)
     implementation(libs.ktor.server.sessions)
     implementation(libs.ktor.server.cio)
+    implementation(libs.ktor.server.content.negotiation)
     implementation(libs.logback.classic)
+    implementation(libs.bundles.monitoring)
+    implementation(libs.bundles.serialization)
+    implementation(libs.bundles.ktor.client)
+    implementation(libs.arrow.core)
+    implementation(libs.kotlin.logging)
     testImplementation(libs.ktor.server.test.host)
     testImplementation(libs.kotlin.test.junit)
 }
