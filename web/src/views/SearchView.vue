@@ -34,12 +34,12 @@ const clear = () => {
     <h2 class="text-2xl">Search</h2>
 
     <div class="p-3">
-      <input type="search" class="w-1/2 rounded-full" v-model="search"/>
+      <input type="search" class="w-1/2 rounded-full" v-model="search" @keyup.enter="performSearch"/>
       <button class="rounded-full bg-blue-400 p-2 m-2" @click="performSearch">Search</button>
       <button class="rounded-full bg-blue-400 p-2 m-2" @click="clear">Reset</button>
     </div>
 
-    <AggregateTotals v-if="data && data?.aggregateResponse" :aggregate="data?.aggregateResponse" />
+    <AggregateTotals v-if="data && data?.aggregateResponse" :aggregate="data?.aggregateResponse"/>
 
     <div class="m-6 flex flex-wrap content-start">
       <SessionItem v-for="session in data?.sessionsResponse" :session="session"/>

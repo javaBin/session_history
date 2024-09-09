@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type {Session} from "@/types/api";
+import {displayFormat, displayLanguage} from "../types/aggregates";
 
 const props = defineProps<{
   session: Session
@@ -12,6 +13,10 @@ const props = defineProps<{
 
     <div class="mt-8 mb-2 text-2xl text-center">
       {{ props.session.title }}
+    </div>
+
+    <div>
+      {{ displayFormat(props.session.format) }} | {{ displayLanguage(props.session.language) }}
     </div>
 
     <div v-if="props.session.video">
