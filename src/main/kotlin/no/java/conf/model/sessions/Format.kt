@@ -13,7 +13,7 @@ enum class Format(
     LIGHTNING_TALK("lightning-talk"),
     WORKSHOP("workshop"),
     PANEL("panel"),
-    BOF("bof"),
+    BIRDS_OF_A_FEATHER("bof"),
     UNKNOWN("unknown"),
     ;
 
