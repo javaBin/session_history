@@ -42,7 +42,7 @@ simple text search
 
 returns matches and some aggregate information
 
-A search of "*" returns aggregate for all documents but no actual hits (used for initial page load)
+A search of `{ "query": "*" }` returns aggregate for all documents but no actual hits (used for initial page load)
 
 ## Local running
 
