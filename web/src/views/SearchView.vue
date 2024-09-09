@@ -35,8 +35,8 @@ const clear = () => {
 
     <div class="p-3">
       <input type="search" class="w-1/2 rounded-full" v-model="search" @keyup.enter="performSearch"/>
-      <button class="rounded-full bg-blue-400 p-2 m-2" @click="performSearch">Search</button>
-      <button class="rounded-full bg-blue-400 p-2 m-2" @click="clear">Reset</button>
+      <button @click="performSearch">Search</button>
+      <button @click="clear">Reset</button>
     </div>
 
     <AggregateTotals v-if="data && data?.aggregateResponse" :aggregate="data?.aggregateResponse"/>
@@ -46,3 +46,9 @@ const clear = () => {
     </div>
   </main>
 </template>
+
+<style scoped>
+button {
+  @apply rounded-full bg-gray-500 p-2 m-2 w-24 text-white;
+}
+</style>

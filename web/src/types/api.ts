@@ -37,12 +37,12 @@ export interface YearAggregate {
 }
 
 export interface Aggregate {
-    languages: LanguageAggregate
-    formats: FormatAggregate
-    years: YearAggregate
+    languages: LanguageAggregate[]
+    formats: FormatAggregate[]
+    years: YearAggregate[]
 }
 
 export interface SearchResponse {
-    sessionsResponse: List<Session>
+    sessionsResponse: Session[]
     aggregateResponse: Aggregate
 }
