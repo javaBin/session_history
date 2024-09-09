@@ -11,6 +11,7 @@ kotlin_logging_version = "7.0.0"
 arrow_version = "1.2.4"
 search_client_version = "2.2.1"
 kotlinx_serialization_version = "1.7.1"
+node_version = "7.0.2"
 
 [libraries]
 arrow-core = { group = "io.arrow-kt", name = "arrow-core", version.ref = "arrow_version" }
@@ -49,3 +50,4 @@ kotlinter = { id = "org.jmailen.kotlinter", version.ref = "kotlinter_version" }
 detekt = { id = "io.gitlab.arturbosch.detekt", version.ref = "detekt_version" }
 versions = { id = "se.ascp.gradle.gradle-versions-filter", version.ref = "gradle_versions_filter_version" }
 serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin_version" }
+node = { id = "com.github.node-gradle.node", version.ref = "node_version" }

@@ -54,7 +54,13 @@ tasks {
 }
 
 tasks.shadowJar {
-    archiveFileName.set("programmes.jar")
+    dependsOn(":web:npm_run_build")
+
+    from("web/dist") {
+        into("static")
+    }
+
+    archiveFileName.set("history.jar")
 }
 
 tasks.jar {
