@@ -150,7 +150,7 @@ class SearchService(
                 query = exists("video")
             }
 
-        return sessions.parseHits<VideoSearchResponse>()
+        return sessions.parseHits<VideoSearchResponse>().sortedBy { -it.year }
     }
 
     private fun Raise<ApiError>.ensureReady() {
@@ -186,7 +186,7 @@ class SearchService(
                 logger.debug { this.json() }
             }
 
-        return sessions.parseHits<SessionResponse>()
+        return sessions.parseHits<SessionResponse>().sortedBy { -it.year }
     }
 
 
