@@ -2,6 +2,7 @@ package no.java.conf.service
 
 import arrow.core.raise.Raise
 import arrow.core.raise.ensure
+import com.jillesvangurp.jsondsl.json
 import com.jillesvangurp.ktsearch.BulkItemCallBack
 import com.jillesvangurp.ktsearch.BulkResponse
 import com.jillesvangurp.ktsearch.OperationType
@@ -12,7 +13,10 @@ import com.jillesvangurp.ktsearch.createIndex
 import com.jillesvangurp.ktsearch.deleteIndex
 import com.jillesvangurp.ktsearch.parseHits
 import com.jillesvangurp.ktsearch.search
+import com.jillesvangurp.searchdsls.querydsl.SearchDSL
+import com.jillesvangurp.searchdsls.querydsl.bool
 import com.jillesvangurp.searchdsls.querydsl.exists
+import com.jillesvangurp.searchdsls.querydsl.nested
 import com.jillesvangurp.searchdsls.querydsl.simpleQueryString
 import com.jillesvangurp.serializationext.DEFAULT_JSON
 import io.github.oshai.kotlinlogging.KotlinLogging
@@ -170,11 +174,22 @@ class SearchService(
         val sessions =
             client.search(INDEX_NAME) {
                 resultSize = docCount
-                query = simpleQueryString(searchRequest.query, "title", "abstract", "speakers.name", "speakers.bio")
+                query = bool {
+                    should(
+                        simpleQueryString(searchRequest.query, "title", "abstract"),
+                        nested {
+                            path = "speakers"
+                            query = simpleQueryString(searchRequest.query, "speakers.name", "speakers.bio")
+                        }
+                    )
+                }
+                logger.debug { this.json() }
             }
 
         return sessions.parseHits<SessionResponse>()
     }
+
+
 
     private suspend fun totalDocs() = client.count(INDEX_NAME).count.toInt()
 }
