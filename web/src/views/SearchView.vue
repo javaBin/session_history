@@ -8,11 +8,7 @@ const data = ref()
 const topLevelAggregates = ref()
 
 onMounted(() => {
-  fetch('/api/search/aggregate', {
-    method: "GET",
-    headers: {'Content-Type': 'application/json'},
-  }).then(response => response.json())
-      .then(res => topLevelAggregates.value = res)
+  performSearch()
 })
 
 const performSearch = () => {
@@ -26,6 +22,12 @@ const performSearch = () => {
       .then(res => data.value = res)
 }
 
+const clear = () => {
+  search.value = "*"
+
+  performSearch()
+}
+
 </script>
 
 <template>
@@ -37,6 +39,7 @@ const performSearch = () => {
     <div class="p-3">
       <input type="search" class="w-1/2 rounded-full" v-model="search"/>
       <button class="rounded-full bg-blue-400 p-2 m-2" @click="performSearch">Search</button>
+      <button class="rounded-full bg-blue-400 p-2 m-2" @click="clear">Reset</button>
     </div>
 
     <AggregateTotals v-if="data && data?.aggregateResponse" :aggregate="data?.aggregateResponse" />

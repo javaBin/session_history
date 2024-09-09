@@ -190,6 +190,10 @@ class SearchService(
 
         ensureReady()
 
+        if (searchRequest.query == "*") {
+            return SearchResponse(emptyList(), totalAggregates())
+        }
+
         val docCount = totalDocs()
 
         val searchResult =
