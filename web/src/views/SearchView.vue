@@ -5,7 +5,6 @@ import AggregateTotals from "@/components/AggregateTotals.vue";
 
 const search = ref("*")
 const data = ref()
-const topLevelAggregates = ref()
 
 onMounted(() => {
   performSearch()
@@ -33,8 +32,6 @@ const clear = () => {
 <template>
   <main class="p-3">
     <h2 class="text-2xl">Search</h2>
-
-    <AggregateTotals v-if="topLevelAggregates" :aggregate="topLevelAggregates" />
 
     <div class="p-3">
       <input type="search" class="w-1/2 rounded-full" v-model="search"/>
