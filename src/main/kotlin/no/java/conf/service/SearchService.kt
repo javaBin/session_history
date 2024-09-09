@@ -68,6 +68,7 @@ class SearchService(
                 mappings(dynamicEnabled = false) {
                     text(Session::title)
                     text(Session::abstract)
+                    text(Session::intendedAudience)
                     keyword(Session::year)
                     keyword(Session::video)
                     keyword(Session::sessionId)
@@ -176,7 +177,7 @@ class SearchService(
                 resultSize = docCount
                 query = bool {
                     should(
-                        simpleQueryString(searchRequest.query, "title", "abstract"),
+                        simpleQueryString(searchRequest.query, "title", "abstract", "intendedAudience"),
                         nested {
                             path = "speakers"
                             query = simpleQueryString(searchRequest.query, "speakers.name", "speakers.bio")

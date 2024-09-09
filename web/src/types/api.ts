@@ -18,4 +18,5 @@ export interface Session {
     format: string
     language: string
     speakers?: Speaker[]
+    intendedAudience?: string
 }

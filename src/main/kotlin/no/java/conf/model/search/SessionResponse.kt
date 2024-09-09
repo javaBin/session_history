@@ -10,5 +10,6 @@ data class SessionResponse(
     val abstract: String?,
     val format: String?,
     val language: String?,
-    val speakers: List<SpeakerResponse>
+    val speakers: List<SpeakerResponse>,
+    val intendedAudience: String?
 )
