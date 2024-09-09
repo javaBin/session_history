@@ -4,6 +4,7 @@ import kotlinx.serialization.Serializable
 import no.java.conf.model.sessions.Format
 import no.java.conf.model.sessions.Language
 import no.java.conf.model.sessions.Session
+import java.util.UUID
 
 @Serializable
 data class SPSession(
@@ -20,8 +21,8 @@ data class SPSession(
     val startTimeZulu: String?,
     val endTimeZulu: String?,
     val id: String,
-    val sessionId: String,
-    val conferenceId: String,
+    val sessionId: String?,
+    val conferenceId: String?,
     val startSlot: String?,
     val startSlotZulu: String?,
     val speakers: List<SPSpeaker>,
@@ -38,8 +39,8 @@ fun SPSession.toSession(year: Int) =
         title = this.title,
         video = this.video?.fixVideo(),
         id = this.id,
-        sessionId = this.sessionId,
-        conferenceId = this.conferenceId,
+        sessionId = this.sessionId ?: UUID.randomUUID().toString(),
+        conferenceId = this.conferenceId ?: UUID.randomUUID().toString(),
         speakers = this.speakers.map(SPSpeaker::toSpeaker),
         year = year,
     )

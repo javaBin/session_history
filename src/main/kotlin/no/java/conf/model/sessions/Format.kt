@@ -14,6 +14,7 @@ enum class Format(
     WORKSHOP("workshop"),
     PANEL("panel"),
     BIRDS_OF_A_FEATHER("bof"),
+    VIDEO("video"),
     UNKNOWN("unknown"),
     ;
 

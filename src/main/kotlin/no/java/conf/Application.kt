@@ -10,6 +10,7 @@ import no.java.conf.plugins.configureSearchRouting
 import no.java.conf.plugins.configureSecurity
 import no.java.conf.plugins.configureSerialization
 import no.java.conf.plugins.httpClient
+import no.java.conf.plugins.localFileService
 import no.java.conf.plugins.searchService
 import no.java.conf.plugins.sleepingPillService
 
@@ -21,6 +22,7 @@ fun main(args: Array<String>) {
 fun Application.module() {
     val searchService = searchService()
     val sleepingPillService = sleepingPillService(httpClient())
+    val localFileService = localFileService()
 
     configureSerialization()
     configureMonitoring()
@@ -32,7 +34,8 @@ fun Application.module() {
 
     scope.launch {
         searchService.setup()
-        val sessions = sleepingPillService.retrieve()
-        searchService.ingest(sessions)
+        val spSessions = sleepingPillService.retrieve()
+        val localSessions = localFileService.read()
+        searchService.ingest(localSessions + spSessions)
     }
 }

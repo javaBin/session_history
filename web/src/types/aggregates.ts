@@ -29,6 +29,9 @@ export function displayFormat(format: string) {
         case 'PANEL': {
             return "Panel";
         }
+        case 'VIDEO': {
+            return "Video";
+        }
         default: {
             return "Unknown";
         }
