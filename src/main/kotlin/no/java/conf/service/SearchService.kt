@@ -3,6 +3,7 @@ package no.java.conf.service
 import arrow.core.raise.Raise
 import arrow.core.raise.ensure
 import com.jillesvangurp.jsondsl.json
+import com.jillesvangurp.ktsearch.Aggregations
 import com.jillesvangurp.ktsearch.BulkItemCallBack
 import com.jillesvangurp.ktsearch.BulkResponse
 import com.jillesvangurp.ktsearch.OperationType
@@ -12,20 +13,29 @@ import com.jillesvangurp.ktsearch.count
 import com.jillesvangurp.ktsearch.createIndex
 import com.jillesvangurp.ktsearch.deleteIndex
 import com.jillesvangurp.ktsearch.parseHits
+import com.jillesvangurp.ktsearch.parsedBuckets
 import com.jillesvangurp.ktsearch.search
-import com.jillesvangurp.searchdsls.querydsl.SearchDSL
+import com.jillesvangurp.ktsearch.termsResult
+import com.jillesvangurp.searchdsls.querydsl.TermsAgg
+import com.jillesvangurp.searchdsls.querydsl.agg
 import com.jillesvangurp.searchdsls.querydsl.bool
 import com.jillesvangurp.searchdsls.querydsl.exists
 import com.jillesvangurp.searchdsls.querydsl.nested
 import com.jillesvangurp.searchdsls.querydsl.simpleQueryString
 import com.jillesvangurp.serializationext.DEFAULT_JSON
 import io.github.oshai.kotlinlogging.KotlinLogging
+import no.java.conf.model.AggregationsNotFound
 import no.java.conf.model.ApiError
 import no.java.conf.model.IndexNotReady
 import no.java.conf.model.SearchMissing
+import no.java.conf.model.search.AggregateResponse
+import no.java.conf.model.search.FormatAggregate
+import no.java.conf.model.search.LanguageAggregate
+import no.java.conf.model.search.SearchResponse
 import no.java.conf.model.search.SessionResponse
 import no.java.conf.model.search.TextSearchRequest
 import no.java.conf.model.search.VideoSearchResponse
+import no.java.conf.model.search.YearAggregate
 import no.java.conf.model.sessions.Session
 import no.java.conf.model.sessions.Speaker
 import kotlin.time.Duration.Companion.seconds
@@ -162,8 +172,18 @@ class SearchService(
 
     fun state(): State = readyState
 
+    fun Aggregations.buildResponse() = AggregateResponse(
+        languages = this.termsResult("by-language")
+            .parsedBuckets.map { LanguageAggregate(it.parsed.key, it.parsed.docCount) },
+        formats = this.termsResult("by-format")
+            .parsedBuckets.map { FormatAggregate(it.parsed.key, it.parsed.docCount) },
+        years = this.termsResult("by-year")
+            .parsedBuckets.map { YearAggregate(it.parsed.key.toInt(), it.parsed.docCount) }
+            .sortedBy { -it.year },
+    )
+
     context(Raise<ApiError>)
-    suspend fun textSearch(searchRequest: TextSearchRequest?): List<SessionResponse> {
+    suspend fun textSearch(searchRequest: TextSearchRequest?): SearchResponse {
         ensure(searchRequest != null && searchRequest.query.isNotBlank()) {
             raise(SearchMissing)
         }
@@ -172,7 +192,7 @@ class SearchService(
 
         val docCount = totalDocs()
 
-        val sessions =
+        val searchResult =
             client.search(INDEX_NAME) {
                 resultSize = docCount
                 query = bool {
@@ -184,13 +204,61 @@ class SearchService(
                         }
                     )
                 }
+                agg("by-language", TermsAgg(Session::language.name) {
+                    aggSize = docCount.toLong()
+                    minDocCount = 1
+                })
+                agg("by-format", TermsAgg(Session::format.name) {
+                    aggSize = docCount.toLong()
+                    minDocCount = 1
+                })
+                agg("by-year", TermsAgg(Session::year) {
+                    aggSize = docCount.toLong()
+                    minDocCount = 1
+                })
                 logger.debug { this.json() }
             }
 
-        return sessions.parseHits<SessionResponse>().sortedBy { -it.year }
+        ensure(searchResult.aggregations != null) {
+            raise(AggregationsNotFound)
+        }
+
+        return SearchResponse(
+            searchResult.parseHits<SessionResponse>().sortedBy { -it.year },
+            searchResult.aggregations!!.buildResponse()
+        )
     }
 
+    context(Raise<ApiError>)
+    suspend fun totalAggregates(): AggregateResponse {
+        ensureReady()
 
+        val docCount = totalDocs()
+
+        val searchResult =
+            client.search(INDEX_NAME) {
+                resultSize = 0
+                agg("by-language", TermsAgg(Session::language.name) {
+                    aggSize = docCount.toLong()
+                    minDocCount = 1
+                })
+                agg("by-format", TermsAgg(Session::format.name) {
+                    aggSize = docCount.toLong()
+                    minDocCount = 1
+                })
+                agg("by-year", TermsAgg(Session::year) {
+                    aggSize = docCount.toLong()
+                    minDocCount = 1
+                })
+                logger.debug { this.json() }
+            }
+
+        ensure(searchResult.aggregations != null) {
+            raise(AggregationsNotFound)
+        }
+
+        return searchResult.aggregations!!.buildResponse()
+    }
 
     private suspend fun totalDocs() = client.count(INDEX_NAME).count.toInt()
 }

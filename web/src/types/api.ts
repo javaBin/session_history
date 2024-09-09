@@ -20,3 +20,29 @@ export interface Session {
     speakers?: Speaker[]
     intendedAudience?: string
 }
+
+export interface LanguageAggregate {
+    language: string
+    count: number
+}
+
+export interface FormatAggregate {
+    format: string
+    count: number
+}
+
+export interface YearAggregate {
+    year: number
+    count: number
+}
+
+export interface Aggregate {
+    languages: LanguageAggregate
+    formats: FormatAggregate
+    years: YearAggregate
+}
+
+export interface SearchResponse {
+    sessionsResponse: List<Session>
+    aggregateResponse: Aggregate
+}

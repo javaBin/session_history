@@ -1,9 +1,19 @@
 <script setup lang="ts">
 import SessionItem from '../components/SessionItem.vue'
-import {ref} from "vue";
+import {onMounted, ref} from "vue";
+import AggregateTotals from "@/components/AggregateTotals.vue";
 
 const search = ref("*")
 const data = ref()
+const topLevelAggregates = ref()
+
+onMounted(() => {
+  fetch('/api/search/aggregate', {
+    method: "GET",
+    headers: {'Content-Type': 'application/json'},
+  }).then(response => response.json())
+      .then(res => topLevelAggregates.value = res)
+})
 
 const performSearch = () => {
   fetch('/api/search', {
@@ -22,13 +32,17 @@ const performSearch = () => {
   <main class="p-3">
     <h2 class="text-2xl">Search</h2>
 
+    <AggregateTotals v-if="topLevelAggregates" :aggregate="topLevelAggregates" />
+
     <div class="p-3">
       <input type="search" class="w-1/2 rounded-full" v-model="search"/>
       <button class="rounded-full bg-blue-400 p-2 m-2" @click="performSearch">Search</button>
     </div>
 
+    <AggregateTotals v-if="data && data?.aggregateResponse" :aggregate="data?.aggregateResponse" />
+
     <div class="m-6 flex flex-wrap content-start">
-      <SessionItem v-for="session in data" :session="session"/>
+      <SessionItem v-for="session in data?.sessionsResponse" :session="session"/>
     </div>
   </main>
 </template>
