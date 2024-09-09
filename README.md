@@ -38,7 +38,7 @@ returns the indexing state - `NEW`/`MAPPED`/`INDEXED`
 
 `{ "query": "searchString" }`
 
-simple text search (currently nested speaker fields not being searched)
+simple text search
 
 returns matches and some aggregate information
 
