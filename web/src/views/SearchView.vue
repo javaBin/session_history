@@ -44,7 +44,8 @@ const clear = () => {
           v-model="search"
           label="Search"
           @keyup.enter="performSearch"
-      ></v-text-field>
+      >
+      </v-text-field>
       <v-btn class="me-2" @click="performSearch">Search</v-btn>
       <v-btn class="me-2" @click="clear">Reset</v-btn>
     </v-form>
