@@ -23,6 +23,7 @@ import com.jillesvangurp.searchdsls.querydsl.bool
 import com.jillesvangurp.searchdsls.querydsl.exists
 import com.jillesvangurp.searchdsls.querydsl.nested
 import com.jillesvangurp.searchdsls.querydsl.simpleQueryString
+import com.jillesvangurp.searchdsls.querydsl.terms
 import com.jillesvangurp.serializationext.DEFAULT_JSON
 import io.github.oshai.kotlinlogging.KotlinLogging
 import no.java.conf.model.AggregationsNotFound
@@ -197,7 +198,7 @@ class SearchService(
             client.search(INDEX_NAME) {
                 when (searchRequest.query) {
                     "*" -> resultSize = 0
-                    else -> addQuery(docCount, searchRequest.query)
+                    else -> addQuery(docCount, searchRequest)
                 }
 
                 addLanguageAggregate(docCount)
@@ -238,19 +239,51 @@ class SearchService(
         })
     }
 
-    private fun SearchDSL.addQuery(docCount: Long, queryString: String) {
+    private fun SearchDSL.addQuery(docCount: Long, searchRequest: TextSearchRequest) {
+        logger.debug { "Building query for $searchRequest" }
+
         this.resultSize = docCount.toInt()
 
-        this.query = bool {
+        val textQuery = bool {
             should(
-                simpleQueryString(queryString, "title", "abstract", "intendedAudience"),
+                simpleQueryString(searchRequest.query, "title", "abstract", "intendedAudience"),
                 nested {
                     path = "speakers"
-                    query = simpleQueryString(queryString, "speakers.name", "speakers.bio")
+                    query = simpleQueryString(searchRequest.query, "speakers.name", "speakers.bio")
                 }
+            )
+        }
+
+        val yearQuery = searchRequest.years.ifEmpty { null }?.let { years ->
+            terms(
+                field = "year",
+                values = years.map { it.toString() }.toTypedArray()
+            )
+        }
+
+        val languageQuery = searchRequest.languages.ifEmpty { null }?.let { languages ->
+            terms(
+                field = "language",
+                values = languages.toTypedArray()
+            )
+        }
+
+        val formatQuery = searchRequest.formats.ifEmpty { null }?.let { formats ->
+            terms(
+                field = "format",
+                values = formats.toTypedArray()
+            )
+        }
+        this.query = bool {
+            must(
+                listOfNotNull(textQuery, yearQuery, languageQuery, formatQuery)
             )
         }
     }
 
     private suspend fun totalDocs() = client.count(INDEX_NAME).count
 }
+
+/*
+
+ */
