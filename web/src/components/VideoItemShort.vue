@@ -8,14 +8,14 @@ const props = defineProps<{
 
 <template>
   <tr>
-    <td class="text-gray-400 p-3 border-2">
+    <td>
       {{ props.video.year }}
     </td>
-    <td class="p-3 border-2">
+    <td>
       {{ props.video.title }}
     </td>
-    <td class="p-3 border-2">
-      <a class="text-blue-400 underline" :href="props.video.video" target="_blank">Video</a>
+    <td>
+      <a :href="props.video.video" target="_blank">Video</a>
     </td>
   </tr>
 </template>

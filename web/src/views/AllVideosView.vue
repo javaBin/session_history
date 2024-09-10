@@ -15,14 +15,14 @@ onMounted(() => {
 </script>
 
 <template>
-  <main class="p-3">
-    <h2 class="text-2xl">All Videos</h2>
-    <table class="table-auto border-collapse border-2">
+  <main>
+    <h2>All Videos</h2>
+    <table>
       <thead>
       <tr>
-        <th class="text-left p-3 border-2">Year</th>
-        <th class="text-left p-3 border-2">Title</th>
-        <th class="text-left p-3 border-2">Link</th>
+        <th>Year</th>
+        <th>Title</th>
+        <th>Link</th>
       </tr>
       </thead>
       <tbody>

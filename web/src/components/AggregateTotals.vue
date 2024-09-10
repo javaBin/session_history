@@ -41,7 +41,7 @@ const yearRow = computed(() => {
 </script>
 
 <template>
-  <div v-if="props.aggregate" class="flex flex-wrap gap-4">
+  <div v-if="props.aggregate">
     <AggregateCard title="Languages" :aggregate="languageRow" />
     <AggregateCard title="Formats" :aggregate="formatRow" />
     <AggregateCard title="Years" :aggregate="yearRow" />

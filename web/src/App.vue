@@ -4,10 +4,10 @@ import { RouterView } from 'vue-router'
 
 <template>
   <header class="p-3">
-    <h1 class="text-6xl">JavaZone Sessions</h1>
+    <h1>JavaZone Sessions</h1>
 
-    <RouterLink class="p-3" to="/" >Search</RouterLink>
-    <RouterLink class="p-3" to="/videos">All Videos</RouterLink>
+    <RouterLink to="/" >Search</RouterLink>
+    <RouterLink to="/videos">All Videos</RouterLink>
   </header>
   <RouterView />
 </template>

@@ -30,25 +30,19 @@ const clear = () => {
 </script>
 
 <template>
-  <main class="p-3">
-    <h2 class="text-2xl">Search</h2>
+  <main>
+    <h2>Search</h2>
 
-    <div class="p-3">
-      <input type="search" class="w-1/2 rounded-full" v-model="search" @keyup.enter="performSearch"/>
+    <div>
+      <input type="search" v-model="search" @keyup.enter="performSearch"/>
       <button @click="performSearch">Search</button>
       <button @click="clear">Reset</button>
     </div>
 
     <AggregateTotals v-if="data && data?.aggregateResponse" :aggregate="data?.aggregateResponse"/>
 
-    <div class="m-6 flex flex-wrap content-start">
+    <div>
       <SessionItem v-for="session in data?.sessionsResponse" :session="session"/>
     </div>
   </main>
 </template>
-
-<style scoped>
-button {
-  @apply rounded-full bg-gray-500 p-2 m-2 w-24 text-white;
-}
-</style>
