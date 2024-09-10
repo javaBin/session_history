@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import VideoItemShort from "@/components/VideoItemShort.vue";
-import {onMounted, ref} from "vue";
+import {computed, onMounted, ref} from "vue";
 
-const data = ref()
+const data = ref([])
 
 onMounted(() => {
   fetch('/api/search/videos', {
@@ -12,22 +12,22 @@ onMounted(() => {
       .then(res => data.value = res)
 })
 
+const items = computed(() => {
+  return data.value.map((video) => {
+    return {
+      title: video.title,
+      year: video.year,
+      link: video.video
+    }
+  })
+})
+
 </script>
 
 <template>
-  <main>
-    <h2>All Videos</h2>
-    <table>
-      <thead>
-      <tr>
-        <th>Year</th>
-        <th>Title</th>
-        <th>Link</th>
-      </tr>
-      </thead>
-      <tbody>
-      <VideoItemShort v-for="video in data" :video="video"/>
-      </tbody>
-    </table>
-  </main>
+  <v-data-table :items="items" items-per-page="100">
+    <template v-slot:item.link="{ value }">
+      <v-btn><a :href="value"><v-icon icon="fas fa-video" /></a></v-btn>
+    </template>
+  </v-data-table>
 </template>
