@@ -61,12 +61,6 @@ fun Application.configureSearchRouting(service: SearchService) {
                 }.respond()
             }
 
-            get("/aggregate") {
-                either {
-                    service.totalAggregates()
-                }.respond()
-            }
-
             post {
                 either {
                     service.textSearch(

@@ -16,6 +16,7 @@ import com.jillesvangurp.ktsearch.parseHits
 import com.jillesvangurp.ktsearch.parsedBuckets
 import com.jillesvangurp.ktsearch.search
 import com.jillesvangurp.ktsearch.termsResult
+import com.jillesvangurp.searchdsls.querydsl.SearchDSL
 import com.jillesvangurp.searchdsls.querydsl.TermsAgg
 import com.jillesvangurp.searchdsls.querydsl.agg
 import com.jillesvangurp.searchdsls.querydsl.bool
@@ -157,7 +158,7 @@ class SearchService(
 
         val sessions =
             client.search(INDEX_NAME) {
-                resultSize = docCount
+                resultSize = docCount.toInt()
                 query = exists("video")
             }
 
@@ -172,7 +173,7 @@ class SearchService(
 
     fun state(): State = readyState
 
-    fun Aggregations.buildResponse() = AggregateResponse(
+    private fun Aggregations.buildResponse() = AggregateResponse(
         languages = this.termsResult("by-language")
             .parsedBuckets.map { LanguageAggregate(it.parsed.key, it.parsed.docCount) },
         formats = this.termsResult("by-format")
@@ -190,36 +191,19 @@ class SearchService(
 
         ensureReady()
 
-        if (searchRequest.query == "*") {
-            return SearchResponse(emptyList(), totalAggregates())
-        }
-
         val docCount = totalDocs()
 
         val searchResult =
             client.search(INDEX_NAME) {
-                resultSize = docCount
-                query = bool {
-                    should(
-                        simpleQueryString(searchRequest.query, "title", "abstract", "intendedAudience"),
-                        nested {
-                            path = "speakers"
-                            query = simpleQueryString(searchRequest.query, "speakers.name", "speakers.bio")
-                        }
-                    )
+                when (searchRequest.query) {
+                    "*" -> resultSize = 0
+                    else -> addQuery(docCount, searchRequest.query)
                 }
-                agg("by-language", TermsAgg(Session::language.name) {
-                    aggSize = docCount.toLong()
-                    minDocCount = 1
-                })
-                agg("by-format", TermsAgg(Session::format.name) {
-                    aggSize = docCount.toLong()
-                    minDocCount = 1
-                })
-                agg("by-year", TermsAgg(Session::year) {
-                    aggSize = docCount.toLong()
-                    minDocCount = 1
-                })
+
+                addLanguageAggregate(docCount)
+                addFormatAggregate(docCount)
+                addYearAggregate(docCount)
+
                 logger.debug { this.json() }
             }
 
@@ -233,36 +217,40 @@ class SearchService(
         )
     }
 
-    context(Raise<ApiError>)
-    suspend fun totalAggregates(): AggregateResponse {
-        ensureReady()
-
-        val docCount = totalDocs()
-
-        val searchResult =
-            client.search(INDEX_NAME) {
-                resultSize = 0
-                agg("by-language", TermsAgg(Session::language.name) {
-                    aggSize = docCount.toLong()
-                    minDocCount = 1
-                })
-                agg("by-format", TermsAgg(Session::format.name) {
-                    aggSize = docCount.toLong()
-                    minDocCount = 1
-                })
-                agg("by-year", TermsAgg(Session::year) {
-                    aggSize = docCount.toLong()
-                    minDocCount = 1
-                })
-                logger.debug { this.json() }
-            }
-
-        ensure(searchResult.aggregations != null) {
-            raise(AggregationsNotFound)
-        }
-
-        return searchResult.aggregations!!.buildResponse()
+    private fun SearchDSL.addLanguageAggregate(docCount: Long) {
+        this.agg("by-language", TermsAgg(Session::language.name) {
+            aggSize = docCount
+            minDocCount = 1
+        })
     }
 
-    private suspend fun totalDocs() = client.count(INDEX_NAME).count.toInt()
+    private fun SearchDSL.addFormatAggregate(docCount: Long) {
+        this.agg("by-format", TermsAgg(Session::format.name) {
+            aggSize = docCount
+            minDocCount = 1
+        })
+    }
+
+    private fun SearchDSL.addYearAggregate(docCount: Long) {
+        this.agg("by-year", TermsAgg(Session::year) {
+            aggSize = docCount
+            minDocCount = 1
+        })
+    }
+
+    private fun SearchDSL.addQuery(docCount: Long, queryString: String) {
+        this.resultSize = docCount.toInt()
+
+        this.query = bool {
+            should(
+                simpleQueryString(queryString, "title", "abstract", "intendedAudience"),
+                nested {
+                    path = "speakers"
+                    query = simpleQueryString(queryString, "speakers.name", "speakers.bio")
+                }
+            )
+        }
+    }
+
+    private suspend fun totalDocs() = client.count(INDEX_NAME).count
 }
