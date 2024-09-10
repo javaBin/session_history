@@ -1,14 +1,21 @@
 <script setup lang="ts">
-import { RouterView } from 'vue-router'
+import {RouterView} from 'vue-router'
 </script>
 
 <template>
-  <header class="p-3">
-    <h1>JavaZone Sessions</h1>
+  <v-layout class="rounded rounded-md">
+    <v-app-bar title="JavaZone Sessions">
+      <v-btn>
+        <RouterLink to="/">Search</RouterLink>
+      </v-btn>
+      <v-btn>
+        <RouterLink to="/videos">All Videos</RouterLink>
+      </v-btn>
+    </v-app-bar>
 
-    <RouterLink to="/" >Search</RouterLink>
-    <RouterLink to="/videos">All Videos</RouterLink>
-  </header>
-  <RouterView />
+    <v-main class="d-flex align-center justify-center" style="min-height: 300px;">
+      <RouterView/>
+    </v-main>
+  </v-layout>
 </template>
 
