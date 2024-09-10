@@ -3,7 +3,7 @@ import SessionItem from '../components/SessionItem.vue'
 import {onMounted, ref} from "vue";
 import AggregateTotals from "@/components/AggregateTotals.vue";
 
-const search = ref("*")
+const search = ref("")
 const data = ref()
 
 onMounted(() => {
@@ -11,18 +11,24 @@ onMounted(() => {
 })
 
 const performSearch = () => {
+  let searchVal = search.value
+
+  if (searchVal == "") {
+    searchVal = "*"
+  }
+
   fetch('/api/search', {
     method: "POST",
     headers: {'Content-Type': 'application/json'},
     body: JSON.stringify({
-      query: search.value
+      query: searchVal
     })
   }).then(response => response.json())
       .then(res => data.value = res)
 }
 
 const clear = () => {
-  search.value = "*"
+  search.value = ""
 
   performSearch()
 }
@@ -30,19 +36,34 @@ const clear = () => {
 </script>
 
 <template>
-  <main>
-    <h2>Search</h2>
+  <div class="text-h4 ma-3">Search</div>
 
-    <div>
-      <input type="search" v-model="search" @keyup.enter="performSearch"/>
-      <button @click="performSearch">Search</button>
-      <button @click="clear">Reset</button>
-    </div>
+  <div class="ma-3">
+    <v-form @submit.prevent>
+      <v-text-field
+          v-model="search"
+          label="Search"
+          @keyup.enter="performSearch"
+      ></v-text-field>
+      <v-btn class="me-2" @click="performSearch">Search</v-btn>
+      <v-btn class="me-2" @click="clear">Reset</v-btn>
+    </v-form>
+  </div>
 
+  <v-divider/>
+
+  <v-navigation-drawer
+      location="end"
+      name="drawer"
+      permanent
+  >
     <AggregateTotals v-if="data && data?.aggregateResponse" :aggregate="data?.aggregateResponse"/>
+  </v-navigation-drawer>
 
-    <div>
+
+  <div class="">
+    <div class="d-flex flex-row flex-wrap justify-center">
       <SessionItem v-for="session in data?.sessionsResponse" :session="session"/>
     </div>
-  </main>
+  </div>
 </template>

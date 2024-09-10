@@ -1,6 +1,4 @@
 <script setup lang="ts">
-import type {Aggregate} from "@/types/api";
-import {displayFormat, displayLanguage} from "@/types/aggregates";
 import type {AggregateCardRow} from "@/types/helpers";
 
 const props = defineProps<{
@@ -10,16 +8,23 @@ const props = defineProps<{
 </script>
 
 <template>
-  <div>
-    <h2>{{ props.title }}</h2>
-
-    <table>
-      <tr v-for="row in props.aggregate">
-        <td>{{ row.name }}</td>
-        <td>
-          <div class="card-count">{{ row.count }}</div>
-        </td>
-      </tr>
-    </table>
-  </div>
+  <v-card variant="elevated">
+    <v-card-item>
+      <v-card-title>
+        {{ props.title }}
+      </v-card-title>
+    </v-card-item>
+    <v-card-text>
+      <v-row v-for="row in props.aggregate" align="center" dense>
+        <v-col class="text-body-2">
+          {{ row.name }}
+        </v-col>
+        <v-col class="text-body-2 text-right">
+          <v-chip>
+            {{ row.count }}
+          </v-chip>
+        </v-col>
+      </v-row>
+    </v-card-text>
+  </v-card>
 </template>

@@ -25,6 +25,8 @@ const items = computed(() => {
 </script>
 
 <template>
+  <div class="text-h4 ma-3">All Videos</div>
+
   <v-data-table :items="items" items-per-page="100">
     <template v-slot:item.link="{ value }">
       <v-btn><a :href="value"><v-icon icon="fas fa-video" /></a></v-btn>
