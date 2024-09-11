@@ -13,10 +13,6 @@ onMounted(() => {
 const performSearch = () => {
   let searchVal = search.value
 
-  if (searchVal == "") {
-    searchVal = "*"
-  }
-
   fetch('/api/search', {
     method: "POST",
     headers: {'Content-Type': 'application/json'},

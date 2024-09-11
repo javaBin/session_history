@@ -2,6 +2,7 @@ package no.java.conf.service
 
 import arrow.core.raise.Raise
 import arrow.core.raise.ensure
+import arrow.core.raise.ensureNotNull
 import com.jillesvangurp.jsondsl.json
 import com.jillesvangurp.ktsearch.Aggregations
 import com.jillesvangurp.ktsearch.BulkItemCallBack
@@ -38,6 +39,8 @@ import no.java.conf.model.search.SessionResponse
 import no.java.conf.model.search.TextSearchRequest
 import no.java.conf.model.search.VideoSearchResponse
 import no.java.conf.model.search.YearAggregate
+import no.java.conf.model.search.filterOnly
+import no.java.conf.model.search.queryString
 import no.java.conf.model.sessions.Session
 import no.java.conf.model.sessions.Speaker
 import kotlin.time.Duration.Companion.seconds
@@ -186,7 +189,7 @@ class SearchService(
 
     context(Raise<ApiError>)
     suspend fun textSearch(searchRequest: TextSearchRequest?): SearchResponse {
-        ensure(searchRequest != null && searchRequest.query.isNotBlank()) {
+        ensureNotNull(searchRequest) {
             raise(SearchMissing)
         }
 
@@ -196,10 +199,7 @@ class SearchService(
 
         val searchResult =
             client.search(INDEX_NAME) {
-                when (searchRequest.query) {
-                    "*" -> resultSize = 0
-                    else -> addQuery(docCount, searchRequest)
-                }
+                addQuery(docCount, searchRequest)
 
                 addLanguageAggregate(docCount)
                 addFormatAggregate(docCount)
@@ -242,16 +242,23 @@ class SearchService(
     private fun SearchDSL.addQuery(docCount: Long, searchRequest: TextSearchRequest) {
         logger.debug { "Building query for $searchRequest" }
 
-        this.resultSize = docCount.toInt()
+        when (searchRequest.filterOnly()) {
+            true -> resultSize = 0
+            false -> docCount.toInt()
+        }
 
-        val textQuery = bool {
-            should(
-                simpleQueryString(searchRequest.query, "title", "abstract", "intendedAudience"),
-                nested {
-                    path = "speakers"
-                    query = simpleQueryString(searchRequest.query, "speakers.name", "speakers.bio")
+        val textQuery = when (searchRequest.filterOnly()) {
+            true -> null
+            false ->
+                bool {
+                    should(
+                        simpleQueryString(searchRequest.queryString(), "title", "abstract", "intendedAudience"),
+                        nested {
+                            path = "speakers"
+                            query = simpleQueryString(searchRequest.queryString(), "speakers.name", "speakers.bio")
+                        }
+                    )
                 }
-            )
         }
 
         val yearQuery = searchRequest.years.ifEmpty { null }?.let { years ->
@@ -274,6 +281,7 @@ class SearchService(
                 values = formats.toTypedArray()
             )
         }
+
         this.query = bool {
             must(
                 listOfNotNull(textQuery, yearQuery, languageQuery, formatQuery)
