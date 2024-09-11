@@ -33,7 +33,7 @@ const props = defineProps<{
         {{ props.session.abstract }}
       </div>
 
-      <div class="mb-2" v-if="session.speakers?.length > 0">
+      <div class="mb-2" v-if="session.speakers && session.speakers?.length > 0">
         <div class="text-h5">Speakers</div>
       </div>
 

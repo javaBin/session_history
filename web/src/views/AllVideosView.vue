@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import {computed, onMounted, ref} from 'vue'
+import type {Video} from "@/types/api";
 
-const data = ref([])
+const data = ref<Video[]>([])
 
 onMounted(() => {
   fetch('/api/search/videos', {

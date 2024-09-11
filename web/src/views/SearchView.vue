@@ -2,12 +2,13 @@
 import SessionItem from '@/components/SessionItem.vue'
 import {onMounted, ref} from "vue";
 import AggregateTotals from "@/components/AggregateTotals.vue";
+import type {SearchQuery} from "@/types/api";
 
 const search = ref("")
 const data = ref()
-const filteredYear = ref<number>(undefined)
-const filteredFormat = ref<string>(undefined)
-const filteredLanguage = ref<string>(undefined)
+const filteredYear = ref<number | undefined>(undefined)
+const filteredFormat = ref<string | undefined>(undefined)
+const filteredLanguage = ref<string | undefined>(undefined)
 
 onMounted(() => {
   performSearch()
@@ -18,7 +19,7 @@ const performSearch = () => {
 
   const query = {
     query: searchVal
-  }
+  } as SearchQuery
 
   if (filteredYear.value) {
     query.years = [filteredYear.value]
@@ -49,23 +50,17 @@ const clear = () => {
   performSearch()
 }
 
-const filterYear = (params: number[]) => {
-  const [year] = params
-
+const filterYear = (year: number) => {
   filteredYear.value = year
   performSearch()
 }
 
-const filterFormat = (params: string[]) => {
-  const [format] = params
-
+const filterFormat = (format: string) => {
   filteredFormat.value = format
   performSearch()
 }
 
-const filterLanguage = (params: string[]) => {
-  const [language] = params
-
+const filterLanguage = (language: string) => {
   filteredLanguage.value = language
   performSearch()
 }

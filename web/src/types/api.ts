@@ -1,3 +1,9 @@
+export interface Video {
+    title: string
+    year: number
+    video: string
+}
+
 export interface Speaker {
     name: string
     twitter?: string
@@ -39,4 +45,11 @@ export interface Aggregate {
 export interface SearchResponse {
     sessionsResponse: Session[]
     aggregateResponse: Aggregate
+}
+
+export interface  SearchQuery {
+    query?: string
+    years?: number[]
+    formats?: string[]
+    languages?: string[]
 }

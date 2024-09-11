@@ -7,11 +7,11 @@ const props = defineProps<{
 }>()
 
 const emit = defineEmits<{
-  filter: [value: string, filter: string]
+  filter: [value: string]
 }>()
 
-const performFilter = (value: string, filter: string) => {
-  emit('filter', [value, filter])
+const performFilter = (value: string) => {
+  emit('filter', value)
 }
 
 </script>
@@ -26,7 +26,7 @@ const performFilter = (value: string, filter: string) => {
     <v-card-text>
       <v-row v-for="row in props.aggregate" align="center" dense>
         <v-col class="text-body-2">
-          <div class="filter-link" @click="performFilter(row.code, row.filter)">{{ row.name }}</div>
+          <div class="filter-link" @click="performFilter(row.code)">{{ row.name }}</div>
         </v-col>
         <v-col class="text-body-2 text-right">
           <v-chip>
