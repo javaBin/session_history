@@ -10,6 +10,8 @@ const filteredYear = ref<number | undefined>(undefined)
 const filteredFormat = ref<string | undefined>(undefined)
 const filteredLanguage = ref<string | undefined>(undefined)
 
+const showSpinner = ref(false)
+
 onMounted(() => {
   performSearch()
 })
@@ -33,12 +35,18 @@ const performSearch = () => {
     query.languages = [filteredLanguage.value]
   }
 
+  showSpinner.value = true
+
   fetch('/api/search', {
     method: "POST",
     headers: {'Content-Type': 'application/json'},
     body: JSON.stringify(query)
   }).then(response => response.json())
-      .then(res => data.value = res)
+      .then(res => {
+        data.value = res
+
+        showSpinner.value = false
+      })
 }
 
 const clear = () => {
@@ -85,6 +93,14 @@ const filterLanguage = (language: string) => {
 
   <v-divider/>
 
+  <v-progress-circular
+      color="primary"
+      indeterminate
+      class="ma-16"
+      v-if="showSpinner"
+  ></v-progress-circular>
+
+
   <v-navigation-drawer
       location="end"
       name="drawer"
@@ -94,7 +110,7 @@ const filterLanguage = (language: string) => {
   </v-navigation-drawer>
 
 
-  <div class="">
+  <div>
     <div class="d-flex flex-row flex-wrap justify-center">
       <SessionItem v-for="session in data?.sessionsResponse" :session="session"/>
     </div>
