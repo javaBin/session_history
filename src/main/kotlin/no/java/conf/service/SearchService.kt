@@ -156,9 +156,9 @@ class SearchService(
 
     context(Raise<ApiError>)
     suspend fun allVideos(): List<VideoSearchResponse> {
-        ensureReady()
+        ensureReady(readyState)
 
-        val docCount = totalDocs()
+        val docCount = client.totalDocs()
 
         val sessions =
             client.search(INDEX_NAME) {
@@ -169,23 +169,7 @@ class SearchService(
         return sessions.parseHits<VideoSearchResponse>().sortedBy { -it.year }
     }
 
-    private fun Raise<ApiError>.ensureReady() {
-        ensure(readyState == State.INDEXED) {
-            raise(IndexNotReady)
-        }
-    }
-
     fun state(): State = readyState
-
-    private fun Aggregations.buildResponse() = AggregateResponse(
-        languages = this.termsResult("by-language")
-            .parsedBuckets.map { LanguageAggregate(it.parsed.key, it.parsed.docCount) },
-        formats = this.termsResult("by-format")
-            .parsedBuckets.map { FormatAggregate(it.parsed.key, it.parsed.docCount) },
-        years = this.termsResult("by-year")
-            .parsedBuckets.map { YearAggregate(it.parsed.key.toInt(), it.parsed.docCount) }
-            .sortedBy { -it.year },
-    )
 
     context(Raise<ApiError>)
     suspend fun textSearch(searchRequest: TextSearchRequest?): SearchResponse {
@@ -193,9 +177,9 @@ class SearchService(
             raise(SearchMissing)
         }
 
-        ensureReady()
+        ensureReady(readyState)
 
-        val docCount = totalDocs()
+        val docCount = client.totalDocs()
 
         val searchResult =
             client.search(INDEX_NAME) {
@@ -217,43 +201,85 @@ class SearchService(
             searchResult.aggregations!!.buildResponse()
         )
     }
+}
 
-    private fun SearchDSL.addLanguageAggregate(docCount: Long) {
-        this.agg("by-language", TermsAgg(Session::language.name) {
+private fun Raise<ApiError>.ensureReady(readyState: State) {
+    ensure(readyState == State.INDEXED) {
+        raise(IndexNotReady)
+    }
+}
+
+private fun Aggregations.buildResponse() =
+    AggregateResponse(
+        languages =
+            this
+                .termsResult("by-language")
+                .parsedBuckets
+                .map { LanguageAggregate(it.parsed.key, it.parsed.docCount) },
+        formats =
+            this
+                .termsResult("by-format")
+                .parsedBuckets
+                .map { FormatAggregate(it.parsed.key, it.parsed.docCount) },
+        years =
+            this
+                .termsResult("by-year")
+                .parsedBuckets
+                .map { YearAggregate(it.parsed.key.toInt(), it.parsed.docCount) }
+                .sortedBy { -it.year },
+    )
+
+private fun SearchDSL.addLanguageAggregate(docCount: Long) {
+    this.agg(
+        "by-language",
+        TermsAgg(Session::language.name) {
             aggSize = docCount
             minDocCount = 1
-        })
-    }
+        }
+    )
+}
 
-    private fun SearchDSL.addFormatAggregate(docCount: Long) {
-        this.agg("by-format", TermsAgg(Session::format.name) {
+private fun SearchDSL.addFormatAggregate(docCount: Long) {
+    this.agg(
+        "by-format",
+        TermsAgg(Session::format.name) {
             aggSize = docCount
             minDocCount = 1
-        })
-    }
+        }
+    )
+}
 
-    private fun SearchDSL.addYearAggregate(docCount: Long) {
-        this.agg("by-year", TermsAgg(Session::year) {
+private fun SearchDSL.addYearAggregate(docCount: Long) {
+    this.agg(
+        "by-year",
+        TermsAgg(Session::year) {
             aggSize = docCount
             minDocCount = 1
-        })
-    }
+        }
+    )
+}
 
-    private fun SearchDSL.addQuery(docCount: Long, searchRequest: TextSearchRequest) {
-        logger.debug { "Building query for $searchRequest" }
+private fun SearchDSL.addQuery(
+    docCount: Long,
+    searchRequest: TextSearchRequest
+) {
+    logger.debug { "Building query for $searchRequest" }
 
-        resultSize = when (!searchRequest.hasQuery() && !searchRequest.hasFilter()) {
+    resultSize =
+        when (!searchRequest.hasQuery() && !searchRequest.hasFilter()) {
             true -> 0
             false -> docCount.toInt()
         }
 
-        val queryString = when {
+    val queryString =
+        when {
             searchRequest.hasQuery() -> searchRequest.query
             searchRequest.hasFilter() -> "*"
             else -> null
         }
 
-        val textQuery = queryString?.let { q ->
+    val textQuery =
+        queryString?.let { q ->
             bool {
                 should(
                     simpleQueryString(q, "title", "abstract", "intendedAudience"),
@@ -265,37 +291,36 @@ class SearchService(
             }
         }
 
-        val yearQuery = searchRequest.years.ifEmpty { null }?.let { years ->
+    val yearQuery =
+        searchRequest.years.ifEmpty { null }?.let { years ->
             terms(
                 field = "year",
                 values = years.map { it.toString() }.toTypedArray()
             )
         }
 
-        val languageQuery = searchRequest.languages.ifEmpty { null }?.let { languages ->
+    val languageQuery =
+        searchRequest.languages.ifEmpty { null }?.let { languages ->
             terms(
                 field = "language",
                 values = languages.toTypedArray()
             )
         }
 
-        val formatQuery = searchRequest.formats.ifEmpty { null }?.let { formats ->
+    val formatQuery =
+        searchRequest.formats.ifEmpty { null }?.let { formats ->
             terms(
                 field = "format",
                 values = formats.toTypedArray()
             )
         }
 
-        this.query = bool {
+    this.query =
+        bool {
             must(
                 listOfNotNull(textQuery, yearQuery, languageQuery, formatQuery)
             )
         }
-    }
-
-    private suspend fun totalDocs() = client.count(INDEX_NAME).count
 }
 
-/*
-
- */
+private suspend fun SearchClient.totalDocs() = this.count(INDEX_NAME).count

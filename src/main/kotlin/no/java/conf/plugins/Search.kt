@@ -14,7 +14,12 @@ import io.ktor.server.routing.routing
 import no.java.conf.model.search.TextSearchRequest
 import no.java.conf.service.SearchService
 
-fun searchClient(host: String, port: Int, username: String, password: String) = SearchClient(
+fun searchClient(
+    host: String,
+    port: Int,
+    username: String,
+    password: String
+) = SearchClient(
     KtorRestClient(
         host = host,
         port = port,
@@ -23,30 +28,35 @@ fun searchClient(host: String, port: Int, username: String, password: String) = 
     ),
 )
 
-fun Application.searchClient() = searchClient(
-    host = environment.config.property("elastic.host").getString(),
-    port = environment.config
-        .property("elastic.port")
-        .getString()
-        .toInt(),
-    username = environment.config.property("elastic.username").getString(),
-    password = environment.config.property("elastic.password").getString(),
-)
-
-fun searchService(searchClient: SearchClient, skipIndex: Boolean) =
-    SearchService(
-        client = searchClient,
-        skipIndex = skipIndex,
+fun Application.searchClient() =
+    searchClient(
+        host = environment.config.property("elastic.host").getString(),
+        port =
+            environment.config
+                .property("elastic.port")
+                .getString()
+                .toInt(),
+        username = environment.config.property("elastic.username").getString(),
+        password = environment.config.property("elastic.password").getString(),
     )
 
-
-fun Application.searchService() = searchService(
-    searchClient = searchClient(),
-    skipIndex = environment.config
-        .property("elastic.skipindex")
-        .getString()
-        .toBoolean()
+fun searchService(
+    searchClient: SearchClient,
+    skipIndex: Boolean
+) = SearchService(
+    client = searchClient,
+    skipIndex = skipIndex,
 )
+
+fun Application.searchService() =
+    searchService(
+        searchClient = searchClient(),
+        skipIndex =
+            environment.config
+                .property("elastic.skipindex")
+                .getString()
+                .toBoolean()
+    )
 
 fun Application.configureSearchRouting(service: SearchService) {
     routing {

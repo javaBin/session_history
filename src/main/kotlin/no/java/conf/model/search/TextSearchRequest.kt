@@ -1,7 +1,6 @@
 package no.java.conf.model.search
 
 import kotlinx.serialization.Serializable
-import no.java.conf.model.sessions.Format
 
 @Serializable
 data class TextSearchRequest(

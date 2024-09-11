@@ -28,24 +28,29 @@ class SleepingPillService(
     private lateinit var sessions: List<Session>
 
     suspend fun retrieve(): List<Session> {
-       sessions = coroutineScope {
-            endpoints.map { endpoint ->
-                async {
-                    fetchEndpoint(endpoint)
-                }
-            }.awaitAll().map {
-                it.sessions.map { session ->
-                    session.toSession(it.year)
-                }
-            }.flatten().also { logger.debug { "SleepingPill - sessions: ${it.count()}" } }
-        }
+        sessions =
+            coroutineScope {
+                endpoints
+                    .map { endpoint ->
+                        async {
+                            fetchEndpoint(endpoint)
+                        }
+                    }.awaitAll()
+                    .map {
+                        it.sessions.map { session ->
+                            session.toSession(it.year)
+                        }
+                    }.flatten()
+                    .also { logger.debug { "SleepingPill - sessions: ${it.count()}" } }
+            }
 
         return sessions
     }
 
-    private suspend fun fetchEndpoint(endpoint: EndpointConfig) = EndpointSessions(
-        endpoint.year,
-        endpoint.endpoint,
-        client.get(endpoint.endpoint).body<SPSessions>().sessions,
-    )
+    private suspend fun fetchEndpoint(endpoint: EndpointConfig) =
+        EndpointSessions(
+            endpoint.year,
+            endpoint.endpoint,
+            client.get(endpoint.endpoint).body<SPSessions>().sessions,
+        )
 }
