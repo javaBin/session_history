@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type {Session} from "@/types/api";
-import {displayFormat, displayLanguage} from "../types/aggregates";
+import {displayFormat, displayLanguage} from "@/types/aggregates";
 
 const props = defineProps<{
   session: Session

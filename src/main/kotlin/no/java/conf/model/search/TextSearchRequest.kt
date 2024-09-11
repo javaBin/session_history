@@ -11,9 +11,6 @@ data class TextSearchRequest(
     val formats: List<String> = emptyList(),
 )
 
-fun TextSearchRequest.filterOnly() = this.queryString() == "*"
+fun TextSearchRequest.hasFilter() = this.years.isNotEmpty() || this.formats.isNotEmpty() || this.languages.isNotEmpty()
 
-fun TextSearchRequest.queryString() = when (this.query.isEmpty()) {
-    true -> "*"
-    else -> this.query
-}
+fun TextSearchRequest.hasQuery() = this.query.isNotBlank() || this.query == "*"

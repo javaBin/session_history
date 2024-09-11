@@ -5,6 +5,15 @@ const props = defineProps<{
   title: string
   aggregate: AggregateCardRow[]
 }>()
+
+const emit = defineEmits<{
+  filter: [value: string, filter: string]
+}>()
+
+const performFilter = (value: string, filter: string) => {
+  emit('filter', [value, filter])
+}
+
 </script>
 
 <template>
@@ -17,7 +26,7 @@ const props = defineProps<{
     <v-card-text>
       <v-row v-for="row in props.aggregate" align="center" dense>
         <v-col class="text-body-2">
-          {{ row.name }}
+          <div class="filter-link" @click="performFilter(row.code, row.filter)">{{ row.name }}</div>
         </v-col>
         <v-col class="text-body-2 text-right">
           <v-chip>
@@ -28,3 +37,9 @@ const props = defineProps<{
     </v-card-text>
   </v-card>
 </template>
+
+<style scoped>
+.filter-link:hover {
+  text-decoration: underline;
+}
+</style>

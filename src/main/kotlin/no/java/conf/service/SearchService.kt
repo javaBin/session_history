@@ -39,8 +39,8 @@ import no.java.conf.model.search.SessionResponse
 import no.java.conf.model.search.TextSearchRequest
 import no.java.conf.model.search.VideoSearchResponse
 import no.java.conf.model.search.YearAggregate
-import no.java.conf.model.search.filterOnly
-import no.java.conf.model.search.queryString
+import no.java.conf.model.search.hasFilter
+import no.java.conf.model.search.hasQuery
 import no.java.conf.model.sessions.Session
 import no.java.conf.model.sessions.Speaker
 import kotlin.time.Duration.Companion.seconds
@@ -242,23 +242,27 @@ class SearchService(
     private fun SearchDSL.addQuery(docCount: Long, searchRequest: TextSearchRequest) {
         logger.debug { "Building query for $searchRequest" }
 
-        when (searchRequest.filterOnly()) {
-            true -> resultSize = 0
+        resultSize = when (!searchRequest.hasQuery() && !searchRequest.hasFilter()) {
+            true -> 0
             false -> docCount.toInt()
         }
 
-        val textQuery = when (searchRequest.filterOnly()) {
-            true -> null
-            false ->
-                bool {
-                    should(
-                        simpleQueryString(searchRequest.queryString(), "title", "abstract", "intendedAudience"),
-                        nested {
-                            path = "speakers"
-                            query = simpleQueryString(searchRequest.queryString(), "speakers.name", "speakers.bio")
-                        }
-                    )
-                }
+        val queryString = when {
+            searchRequest.hasQuery() -> searchRequest.query
+            searchRequest.hasFilter() -> "*"
+            else -> null
+        }
+
+        val textQuery = queryString?.let { q ->
+            bool {
+                should(
+                    simpleQueryString(q, "title", "abstract", "intendedAudience"),
+                    nested {
+                        path = "speakers"
+                        query = simpleQueryString(q, "speakers.name", "speakers.bio")
+                    }
+                )
+            }
         }
 
         val yearQuery = searchRequest.years.ifEmpty { null }?.let { years ->

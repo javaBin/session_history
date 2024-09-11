@@ -1,9 +1,3 @@
-export interface VideoShort {
-    title: string
-    video: string
-    tear: number
-}
-
 export interface Speaker {
     name: string
     twitter?: string
