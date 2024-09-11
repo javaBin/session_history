@@ -3,6 +3,7 @@ package no.java.conf.plugins
 import arrow.core.raise.either
 import com.jillesvangurp.ktsearch.KtorRestClient
 import com.jillesvangurp.ktsearch.SearchClient
+import io.github.oshai.kotlinlogging.KotlinLogging
 import io.ktor.server.application.Application
 import io.ktor.server.application.call
 import io.ktor.server.request.receiveNullable
@@ -14,19 +15,25 @@ import io.ktor.server.routing.routing
 import no.java.conf.model.search.TextSearchRequest
 import no.java.conf.service.SearchService
 
+private val logger = KotlinLogging.logger {}
+
 fun searchClient(
     host: String,
     port: Int,
     username: String,
     password: String
-) = SearchClient(
-    KtorRestClient(
-        host = host,
-        port = port,
-        user = username,
-        password = password,
-    ),
-)
+): SearchClient {
+    logger.info { "Connection Info: $host:$port with $username" }
+
+    return SearchClient(
+        KtorRestClient(
+            host = host,
+            port = port,
+            user = username,
+            password = password,
+        ),
+    )
+}
 
 fun Application.searchClient() =
     searchClient(
