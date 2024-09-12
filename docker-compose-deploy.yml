@@ -1,0 +1,39 @@
+name: jz-history
+
+services:
+  elasticsearch:
+    ports:
+      - "9200:9200"
+    container_name: elasticsearch
+    environment:
+      - ELASTIC_PASSWORD=elastic
+      - discovery.type=single-node
+      - xpack.security.http.ssl.enabled=false
+      - xpack.license.self_generated.type=trial
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.15.1
+    networks:
+      - history
+    healthcheck:
+      test: curl -s http://localhost:9200 | grep -q 'missing authentication credentials'
+      interval: 10s
+      timeout: 10s
+      retries: 120
+
+  ktor:
+    build: .
+    ports:
+      - "18181:8080"
+    container_name: history
+    environment:
+      - ELASTIC_HOST=elasticsearch
+      - ELASTIC_PASSWORD=elastic
+    image: jzhistory:latest
+    networks:
+      - history
+    depends_on:
+      elasticsearch:
+        condition: service_healthy
+
+networks:
+  history:
+    name: history_network
