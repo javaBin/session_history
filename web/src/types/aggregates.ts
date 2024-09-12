@@ -1,4 +1,8 @@
-export function displayLanguage(lang: string) {
+export function displayLanguage(lang?: string) {
+    if (lang === undefined) {
+        return undefined
+    }
+
     switch (lang) {
         case 'NO': {
             return "Norwegian";
@@ -12,7 +16,11 @@ export function displayLanguage(lang: string) {
     }
 }
 
-export function displayFormat(format: string) {
+export function displayFormat(format?: string) {
+    if (format === undefined) {
+        return undefined
+    }
+
     switch (format) {
         case 'PRESENTATION': {
             return "Presentation";

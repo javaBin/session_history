@@ -37,7 +37,7 @@ const props = defineProps<{
         <div class="text-h5">Speakers</div>
       </div>
 
-      <div v-for="speaker in props.session.speakers" class="mt-2 mb-2">
+      <div v-for="speaker in props.session.speakers" :key="speaker.name" class="mt-2 mb-2">
         <div class="text-h6">{{ speaker.name }}</div>
 
         <p v-if="speaker.bio">{{ speaker.bio }}</p>

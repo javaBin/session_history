@@ -4,14 +4,20 @@ import type {AggregateCardRow} from "@/types/helpers";
 const props = defineProps<{
   title: string
   aggregate: AggregateCardRow[]
+  filter?: string
 }>()
 
 const emit = defineEmits<{
   filter: [value: string]
+  clear: []
 }>()
 
 const performFilter = (value: string) => {
   emit('filter', value)
+}
+
+const clearFilter = () => {
+  emit('clear')
 }
 
 </script>
@@ -24,7 +30,16 @@ const performFilter = (value: string) => {
       </v-card-title>
     </v-card-item>
     <v-card-text>
-      <v-row v-for="row in props.aggregate" align="center" dense>
+      <v-row v-if="props.filter">
+        <v-col class="text-body-2">
+          <v-icon icon="far fa-window-close" @click="clearFilter()"/>
+          <div class="filter-link pl-2 d-inline-block" @click="clearFilter()">
+            {{ props.filter }}
+          </div>
+        </v-col>
+
+      </v-row>
+      <v-row v-else v-for="row in props.aggregate" :key="row.code" align="center" dense>
         <v-col class="text-body-2">
           <div class="filter-link" @click="performFilter(row.code)">{{ row.name }}</div>
         </v-col>

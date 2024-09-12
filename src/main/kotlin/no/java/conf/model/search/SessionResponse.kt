@@ -4,6 +4,7 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class SessionResponse(
+    val id: String,
     val title: String,
     val video: String?,
     val year: Int,

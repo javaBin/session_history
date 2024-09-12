@@ -11,6 +11,7 @@ export interface Speaker {
 }
 
 export interface Session {
+    id: string
     title: string
     video?: string
     year: number

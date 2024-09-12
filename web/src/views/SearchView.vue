@@ -73,6 +73,25 @@ const filterLanguage = (language: string) => {
   performSearch()
 }
 
+const clearFilter = (filter: string) => {
+  switch (filter) {
+    case "LANGUAGE": {
+      filteredLanguage.value = undefined
+      break;
+    }
+    case "FORMAT": {
+      filteredFormat.value = undefined
+      break;
+    }
+    case "YEAR": {
+      filteredYear.value = undefined
+      break;
+    }
+  }
+
+  performSearch()
+}
+
 </script>
 
 <template>
@@ -106,13 +125,21 @@ const filterLanguage = (language: string) => {
       name="drawer"
       permanent
   >
-    <AggregateTotals v-if="data && data?.aggregateResponse" :aggregate="data?.aggregateResponse" @filterYear="filterYear" @filterFormat="filterFormat" @filterLanguage="filterLanguage"/>
+    <AggregateTotals v-if="data && data?.aggregateResponse"
+                     :aggregate="data?.aggregateResponse"
+                     @filterYear="filterYear"
+                     @filterFormat="filterFormat"
+                     @filterLanguage="filterLanguage"
+                     @clear="clearFilter"
+                     :filteredFormat="filteredFormat"
+                     :filteredLanguage="filteredLanguage"
+                     :filteredYear="filteredYear"/>
   </v-navigation-drawer>
 
 
   <div>
     <div class="d-flex flex-row flex-wrap justify-center">
-      <SessionItem v-for="session in data?.sessionsResponse" :session="session"/>
+      <SessionItem v-for="session in data?.sessionsResponse" :key="session.id" :session="session"/>
     </div>
   </div>
 </template>
