@@ -1,5 +1,5 @@
 export interface AggregateCardRow {
-    name: string
-    code: string
-    count: number
+  name: string
+  code: string
+  count: number
 }

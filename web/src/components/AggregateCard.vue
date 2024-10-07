@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type {AggregateCardRow} from "@/types/helpers";
+import type { AggregateCardRow } from '@/types/helpers'
 
 const props = defineProps<{
   title: string
@@ -19,7 +19,6 @@ const performFilter = (value: string) => {
 const clearFilter = () => {
   emit('clear')
 }
-
 </script>
 
 <template>
@@ -32,12 +31,11 @@ const clearFilter = () => {
     <v-card-text>
       <v-row v-if="props.filter">
         <v-col class="text-body-2">
-          <v-icon icon="far fa-window-close" @click="clearFilter()"/>
+          <v-icon icon="far fa-window-close" @click="clearFilter()" />
           <div class="filter-link pl-2 d-inline-block" @click="clearFilter()">
             {{ props.filter }}
           </div>
         </v-col>
-
       </v-row>
       <v-row v-else v-for="row in props.aggregate" :key="row.code" align="center" dense>
         <v-col class="text-body-2">

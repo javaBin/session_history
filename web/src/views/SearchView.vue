@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import SessionItem from '@/components/SessionItem.vue'
-import {onMounted, ref} from "vue";
-import AggregateTotals from "@/components/AggregateTotals.vue";
-import type {SearchQuery} from "@/types/api";
+import { onMounted, ref } from 'vue'
+import AggregateTotals from '@/components/AggregateTotals.vue'
+import type { SearchQuery } from '@/types/api'
 
-const search = ref("")
+const search = ref('')
 const data = ref()
 const filteredYear = ref<number | undefined>(undefined)
 const filteredFormat = ref<string | undefined>(undefined)
@@ -38,19 +38,20 @@ const performSearch = () => {
   showSpinner.value = true
 
   fetch('/api/search', {
-    method: "POST",
-    headers: {'Content-Type': 'application/json'},
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(query)
-  }).then(response => response.json())
-      .then(res => {
-        data.value = res
+  })
+    .then((response) => response.json())
+    .then((res) => {
+      data.value = res
 
-        showSpinner.value = false
-      })
+      showSpinner.value = false
+    })
 }
 
 const clear = () => {
-  search.value = ""
+  search.value = ''
   filteredYear.value = undefined
   filteredFormat.value = undefined
   filteredLanguage.value = undefined
@@ -75,23 +76,22 @@ const filterLanguage = (language: string) => {
 
 const clearFilter = (filter: string) => {
   switch (filter) {
-    case "LANGUAGE": {
+    case 'LANGUAGE': {
       filteredLanguage.value = undefined
-      break;
+      break
     }
-    case "FORMAT": {
+    case 'FORMAT': {
       filteredFormat.value = undefined
-      break;
+      break
     }
-    case "YEAR": {
+    case 'YEAR': {
       filteredYear.value = undefined
-      break;
+      break
     }
   }
 
   performSearch()
 }
-
 </script>
 
 <template>
@@ -99,47 +99,38 @@ const clearFilter = (filter: string) => {
 
   <div class="ma-3">
     <v-form @submit.prevent>
-      <v-text-field
-          v-model="search"
-          label="Search"
-          @keyup.enter="performSearch"
-      >
-      </v-text-field>
+      <v-text-field v-model="search" label="Search" @keyup.enter="performSearch"> </v-text-field>
       <v-btn class="me-2" @click="performSearch">Search</v-btn>
       <v-btn class="me-2" @click="clear">Reset</v-btn>
     </v-form>
   </div>
 
-  <v-divider/>
+  <v-divider />
 
   <v-progress-circular
-      color="primary"
-      indeterminate
-      class="ma-16"
-      v-if="showSpinner"
+    color="primary"
+    indeterminate
+    class="ma-16"
+    v-if="showSpinner"
   ></v-progress-circular>
 
-
-  <v-navigation-drawer
-      location="end"
-      name="drawer"
-      permanent
-  >
-    <AggregateTotals v-if="data && data?.aggregateResponse"
-                     :aggregate="data?.aggregateResponse"
-                     @filterYear="filterYear"
-                     @filterFormat="filterFormat"
-                     @filterLanguage="filterLanguage"
-                     @clear="clearFilter"
-                     :filteredFormat="filteredFormat"
-                     :filteredLanguage="filteredLanguage"
-                     :filteredYear="filteredYear"/>
+  <v-navigation-drawer location="end" name="drawer" permanent>
+    <AggregateTotals
+      v-if="data && data?.aggregateResponse"
+      :aggregate="data?.aggregateResponse"
+      @filterYear="filterYear"
+      @filterFormat="filterFormat"
+      @filterLanguage="filterLanguage"
+      @clear="clearFilter"
+      :filteredFormat="filteredFormat"
+      :filteredLanguage="filteredLanguage"
+      :filteredYear="filteredYear"
+    />
   </v-navigation-drawer>
-
 
   <div>
     <div class="d-flex flex-row flex-wrap justify-center">
-      <SessionItem v-for="session in data?.sessionsResponse" :key="session.id" :session="session"/>
+      <SessionItem v-for="session in data?.sessionsResponse" :key="session.id" :session="session" />
     </div>
   </div>
 </template>

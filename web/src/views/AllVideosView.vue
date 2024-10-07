@@ -1,16 +1,16 @@
 <script setup lang="ts">
-import {onMounted, ref} from 'vue'
-import type {Video} from "@/types/api";
+import { onMounted, ref } from 'vue'
+import type { Video } from '@/types/api'
 
 const data = ref<Video[]>([])
 
 onMounted(() => {
   fetch('/api/search/videos', {
     method: 'GET',
-    headers: {'Content-Type': 'application/json'}
+    headers: { 'Content-Type': 'application/json' }
   })
-      .then((response) => response.json())
-      .then((res) => (data.value = res))
+    .then((response) => response.json())
+    .then((res) => (data.value = res))
 })
 </script>
 
@@ -21,7 +21,7 @@ onMounted(() => {
     <template #[`item.video`]="{ value }">
       <v-btn>
         <a :href="value">
-          <v-icon icon="fas fa-video"/>
+          <v-icon icon="fas fa-video" />
         </a>
       </v-btn>
     </template>

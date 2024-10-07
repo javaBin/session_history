@@ -1,16 +1,19 @@
 <script setup lang="ts">
-import type {Session} from "@/types/api";
-import {displayFormat, displayLanguage} from "@/types/aggregates";
+import type { Session } from '@/types/api'
+import { displayFormat, displayLanguage } from '@/types/aggregates'
 
 const props = defineProps<{
   session: Session
 }>()
-
 </script>
 <template>
   <v-card class="ma-2 pa-2" width="500">
     <v-card-title class="text-h4 position-relative pt-6">
-      <div class="text-body-2 pa-2 position-absolute top-0 right-0 bg-primary rounded-lg d-inline-block">{{ props.session.year }}</div>
+      <div
+        class="text-body-2 pa-2 position-absolute top-0 right-0 bg-primary rounded-lg d-inline-block"
+      >
+        {{ props.session.year }}
+      </div>
       {{ props.session.title }}
     </v-card-title>
 
@@ -47,7 +50,8 @@ const props = defineProps<{
 </template>
 
 <style scoped>
-.v-card-text, .v-card-title {
+.v-card-text,
+.v-card-title {
   white-space: normal;
 }
 </style>
