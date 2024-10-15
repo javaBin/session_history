@@ -54,9 +54,9 @@ tasks {
 }
 
 tasks.shadowJar {
-    dependsOn(":web:npm_run_build")
+    dependsOn(":frontend:npm_run_generate")
 
-    from("web/dist") {
+    from("frontend/.output/public") {
         into("static")
     }
 
