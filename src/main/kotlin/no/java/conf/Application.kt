@@ -7,7 +7,6 @@ import kotlinx.coroutines.launch
 import no.java.conf.plugins.configureMonitoring
 import no.java.conf.plugins.configureRouting
 import no.java.conf.plugins.configureSearchRouting
-import no.java.conf.plugins.configureSecurity
 import no.java.conf.plugins.configureSerialization
 import no.java.conf.plugins.httpClient
 import no.java.conf.plugins.localFileService
@@ -26,7 +25,6 @@ fun Application.module() {
 
     configureSerialization()
     configureMonitoring()
-    configureSecurity()
     configureRouting()
     configureSearchRouting(searchService)
 
