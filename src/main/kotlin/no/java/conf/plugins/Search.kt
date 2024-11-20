@@ -5,7 +5,6 @@ import com.jillesvangurp.ktsearch.KtorRestClient
 import com.jillesvangurp.ktsearch.SearchClient
 import io.github.oshai.kotlinlogging.KotlinLogging
 import io.ktor.server.application.Application
-import io.ktor.server.application.call
 import io.ktor.server.request.receiveNullable
 import io.ktor.server.response.respondText
 import io.ktor.server.routing.get
@@ -16,6 +15,7 @@ import no.java.conf.model.search.TextSearchRequest
 import no.java.conf.service.SearchService
 import no.java.conf.service.search.ElasticIndexer
 import no.java.conf.service.search.ElasticIngester
+import no.java.conf.service.search.ElasticSearcher
 
 private val logger = KotlinLogging.logger {}
 
@@ -50,14 +50,14 @@ fun Application.searchClient() =
     )
 
 fun searchService(
-    searchClient: SearchClient,
     indexer: ElasticIndexer,
     ingester: ElasticIngester,
+    searcher: ElasticSearcher,
     skipIndex: Boolean
 ) = SearchService(
-    client = searchClient,
     indexer = indexer,
     ingester = ingester,
+    searcher = searcher,
     skipIndex = skipIndex,
 )
 
@@ -65,9 +65,9 @@ fun Application.searchService(): SearchService {
     val searchClient = searchClient()
 
     return searchService(
-        searchClient = searchClient,
         indexer = ElasticIndexer(searchClient),
         ingester = ElasticIngester(searchClient),
+        searcher = ElasticSearcher(searchClient),
         skipIndex =
             environment.config
                 .property("elastic.skipindex")

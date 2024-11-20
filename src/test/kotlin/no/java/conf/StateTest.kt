@@ -1,6 +1,5 @@
 package no.java.conf
 
-import com.jillesvangurp.ktsearch.SearchClient
 import io.ktor.client.request.get
 import io.ktor.client.statement.bodyAsText
 import io.ktor.http.HttpStatusCode
@@ -14,17 +13,18 @@ import no.java.conf.plugins.configureSearchRouting
 import no.java.conf.service.SearchService
 import no.java.conf.service.search.ElasticIndexer
 import no.java.conf.service.search.ElasticIngester
+import no.java.conf.service.search.ElasticSearcher
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
 class StateTest {
     @Test
     fun testNew() {
-        val searchClient = mockk<SearchClient>()
         val indexer = mockk<ElasticIndexer>()
         val ingester = mockk<ElasticIngester>()
+        val searcher = mockk<ElasticSearcher>()
 
-        val service = SearchService(searchClient, indexer, ingester, false)
+        val service = SearchService(indexer, ingester, searcher, false)
 
         testApplication {
             application {
@@ -40,11 +40,11 @@ class StateTest {
 
     @Test
     fun testMapped() {
-        val searchClient = mockk<SearchClient>()
         val indexer = mockk<ElasticIndexer>()
         val ingester = mockk<ElasticIngester>()
+        val searcher = mockk<ElasticSearcher>()
 
-        val service = SearchService(searchClient, indexer, ingester, false)
+        val service = SearchService(indexer, ingester, searcher, false)
 
         coEvery { indexer.recreateIndex(any()) } just runs
 
@@ -66,11 +66,11 @@ class StateTest {
 
     @Test
     fun testIndexed() {
-        val searchClient = mockk<SearchClient>()
         val indexer = mockk<ElasticIndexer>()
         val ingester = mockk<ElasticIngester>()
+        val searcher = mockk<ElasticSearcher>()
 
-        val service = SearchService(searchClient, indexer, ingester, false)
+        val service = SearchService(indexer, ingester, searcher, false)
 
         coEvery { indexer.recreateIndex(any()) } just runs
         coEvery { ingester.ingest(any(), any()) } just runs
@@ -94,11 +94,11 @@ class StateTest {
 
     @Test
     fun testSkipIndexNew() {
-        val searchClient = mockk<SearchClient>()
         val indexer = mockk<ElasticIndexer>()
         val ingester = mockk<ElasticIngester>()
+        val searcher = mockk<ElasticSearcher>()
 
-        val service = SearchService(searchClient, indexer, ingester, true)
+        val service = SearchService(indexer, ingester, searcher, true)
 
         testApplication {
             application {
@@ -114,11 +114,11 @@ class StateTest {
 
     @Test
     fun testSkipIndexMapped() {
-        val searchClient = mockk<SearchClient>()
         val indexer = mockk<ElasticIndexer>()
         val ingester = mockk<ElasticIngester>()
+        val searcher = mockk<ElasticSearcher>()
 
-        val service = SearchService(searchClient, indexer, ingester, true)
+        val service = SearchService(indexer, ingester, searcher, true)
 
         runBlocking {
             service.setup()
@@ -138,11 +138,11 @@ class StateTest {
 
     @Test
     fun testSkipIndexIndexed() {
-        val searchClient = mockk<SearchClient>()
         val indexer = mockk<ElasticIndexer>()
         val ingester = mockk<ElasticIngester>()
+        val searcher = mockk<ElasticSearcher>()
 
-        val service = SearchService(searchClient, indexer, ingester, true)
+        val service = SearchService(indexer, ingester, searcher, true)
 
         runBlocking {
             service.setup()
