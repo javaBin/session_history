@@ -14,6 +14,8 @@ import io.ktor.server.routing.route
 import io.ktor.server.routing.routing
 import no.java.conf.model.search.TextSearchRequest
 import no.java.conf.service.SearchService
+import no.java.conf.service.search.ElasticIndexer
+import no.java.conf.service.search.ElasticIngester
 
 private val logger = KotlinLogging.logger {}
 
@@ -49,21 +51,30 @@ fun Application.searchClient() =
 
 fun searchService(
     searchClient: SearchClient,
+    indexer: ElasticIndexer,
+    ingester: ElasticIngester,
     skipIndex: Boolean
 ) = SearchService(
     client = searchClient,
+    indexer = indexer,
+    ingester = ingester,
     skipIndex = skipIndex,
 )
 
-fun Application.searchService() =
-    searchService(
-        searchClient = searchClient(),
+fun Application.searchService(): SearchService {
+    val searchClient = searchClient()
+
+    return searchService(
+        searchClient = searchClient,
+        indexer = ElasticIndexer(searchClient),
+        ingester = ElasticIngester(searchClient),
         skipIndex =
             environment.config
                 .property("elastic.skipindex")
                 .getString()
                 .toBoolean()
     )
+}
 
 fun Application.configureSearchRouting(service: SearchService) {
     routing {

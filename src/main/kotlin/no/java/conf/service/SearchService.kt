@@ -5,14 +5,8 @@ import arrow.core.raise.ensure
 import arrow.core.raise.ensureNotNull
 import com.jillesvangurp.jsondsl.json
 import com.jillesvangurp.ktsearch.Aggregations
-import com.jillesvangurp.ktsearch.BulkItemCallBack
-import com.jillesvangurp.ktsearch.BulkResponse
-import com.jillesvangurp.ktsearch.OperationType
 import com.jillesvangurp.ktsearch.SearchClient
-import com.jillesvangurp.ktsearch.bulk
 import com.jillesvangurp.ktsearch.count
-import com.jillesvangurp.ktsearch.createIndex
-import com.jillesvangurp.ktsearch.deleteIndex
 import com.jillesvangurp.ktsearch.parseHits
 import com.jillesvangurp.ktsearch.parsedBuckets
 import com.jillesvangurp.ktsearch.search
@@ -25,7 +19,6 @@ import com.jillesvangurp.searchdsls.querydsl.exists
 import com.jillesvangurp.searchdsls.querydsl.nested
 import com.jillesvangurp.searchdsls.querydsl.simpleQueryString
 import com.jillesvangurp.searchdsls.querydsl.terms
-import com.jillesvangurp.serializationext.DEFAULT_JSON
 import io.github.oshai.kotlinlogging.KotlinLogging
 import no.java.conf.model.AggregationsNotFound
 import no.java.conf.model.ApiError
@@ -42,15 +35,11 @@ import no.java.conf.model.search.YearAggregate
 import no.java.conf.model.search.hasFilter
 import no.java.conf.model.search.hasQuery
 import no.java.conf.model.sessions.Session
-import no.java.conf.model.sessions.Speaker
-import kotlin.time.Duration.Companion.seconds
+import no.java.conf.service.search.ElasticIndexer
+import no.java.conf.service.search.ElasticIngester
 import kotlin.time.measureTimedValue
 
 private const val INDEX_NAME = "javazone"
-
-private const val REPLICAS = 0
-private const val SHARDS = 3
-private const val REFRESH = 10
 
 private val logger = KotlinLogging.logger {}
 
@@ -62,6 +51,8 @@ enum class State {
 
 class SearchService(
     private val client: SearchClient,
+    private val indexer: ElasticIndexer,
+    private val ingester: ElasticIngester,
     private val skipIndex: Boolean,
 ) {
     private var readyState = State.NEW
@@ -78,30 +69,7 @@ class SearchService(
         if (!skipIndex) {
             logger.debug { "Creating index" }
 
-            client.deleteIndex(INDEX_NAME, ignoreUnavailable = true)
-
-            client.createIndex(INDEX_NAME) {
-                settings {
-                    replicas = REPLICAS
-                    shards = SHARDS
-                    refreshInterval = REFRESH.seconds
-                }
-                mappings(dynamicEnabled = false) {
-                    text(Session::title)
-                    text(Session::abstract)
-                    text(Session::intendedAudience)
-                    keyword(Session::year)
-                    keyword(Session::video)
-                    keyword(Session::sessionId)
-                    keyword(Session::format)
-                    keyword(Session::language)
-                    nestedField("speakers") {
-                        text(Speaker::name)
-                        keyword(Speaker::twitter)
-                        text(Speaker::bio)
-                    }
-                }
-            }
+            indexer.recreateIndex(INDEX_NAME)
         }
 
         logger.debug { "State -> Mapped" }
@@ -121,44 +89,7 @@ class SearchService(
         if (!skipIndex) {
             logger.debug { "Bulk" }
 
-            val itemCallBack =
-                object : BulkItemCallBack {
-                    override fun bulkRequestFailed(
-                        e: Exception,
-                        ops: List<Pair<String, String?>>,
-                    ) {
-                        logger.error(e) { "Bulk failed" }
-                    }
-
-                    override fun itemFailed(
-                        operationType: OperationType,
-                        item: BulkResponse.ItemDetails,
-                    ) {
-                        logger.warn { "${operationType.name} failed ${item.id} with ${item.status}" }
-                    }
-
-                    override fun itemOk(
-                        operationType: OperationType,
-                        item: BulkResponse.ItemDetails,
-                    ) {
-                        logger.trace {
-                            "${operationType.name} completed ${item.id} seq ${item.seqNo} p_term ${item.primaryTerm}"
-                        }
-                    }
-                }
-
-            val timeTaken =
-                measureTimedValue {
-                    client.bulk(callBack = itemCallBack) {
-                        sessions.forEach { session ->
-                            index(
-                                source = DEFAULT_JSON.encodeToString(Session.serializer(), session),
-                                index = INDEX_NAME,
-                                id = session.sessionId,
-                            )
-                        }
-                    }
-                }
+            val timeTaken = measureTimedValue { ingester.ingest(INDEX_NAME, sessions) }
 
             logger.info { "Time taken to index - $timeTaken" }
         } else {
