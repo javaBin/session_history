@@ -14,8 +14,7 @@ suspend inline fun <reified A : Any> Either<ApiError, A>.respond(status: HttpSta
         is Either.Right -> call.respond(status, value)
     }
 
-suspend fun RoutingContext.respond(error: ApiError) =
-    call.respond(error.statusCode, error.messageMap())
+suspend fun RoutingContext.respond(error: ApiError) = call.respond(error.statusCode, error.messageMap())
 
 context(RoutingContext)
 suspend inline fun <reified A : Any> Either<ApiError, A>.respondRedirect(url: String) =
