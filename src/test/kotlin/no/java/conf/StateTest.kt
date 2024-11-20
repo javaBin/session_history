@@ -5,14 +5,12 @@ import io.ktor.client.request.get
 import io.ktor.client.statement.bodyAsText
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.testing.testApplication
-import io.mockk.every
 import io.mockk.mockk
 import kotlinx.coroutines.runBlocking
 import no.java.conf.plugins.configureSearchRouting
 import no.java.conf.service.SearchService
 import kotlin.test.Test
 import kotlin.test.assertEquals
-import kotlin.test.assertTrue
 
 class StateTest {
     @Test
@@ -22,7 +20,6 @@ class StateTest {
         val service = SearchService(searchClient, false)
 
         testApplication {
-
             application {
                 configureSearchRouting(service)
             }
@@ -34,7 +31,6 @@ class StateTest {
         }
     }
 
-
     @Test
     fun testSkipIndex() {
         val searchClient = mockk<SearchClient>()
@@ -42,7 +38,6 @@ class StateTest {
         val service = SearchService(searchClient, true)
 
         testApplication {
-
             application {
                 configureSearchRouting(service)
             }
@@ -65,7 +60,6 @@ class StateTest {
         }
 
         testApplication {
-
             application {
                 configureSearchRouting(service)
             }
@@ -76,7 +70,6 @@ class StateTest {
             }
         }
     }
-
 
     @Test
     fun testSkipIndexIndexed() {
@@ -90,7 +83,6 @@ class StateTest {
         }
 
         testApplication {
-
             application {
                 configureSearchRouting(service)
             }
