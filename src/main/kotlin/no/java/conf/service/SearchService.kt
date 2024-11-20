@@ -67,11 +67,17 @@ class SearchService(
     private var readyState = State.NEW
 
     suspend fun setup() {
+        logger.debug { "Setting up SearchService" }
+
         if (readyState != State.NEW) {
+            logger.debug { "Incorrect search state - was $readyState" }
+
             return
         }
 
         if (!skipIndex) {
+            logger.debug { "Creating index" }
+
             client.deleteIndex(INDEX_NAME, ignoreUnavailable = true)
 
             client.createIndex(INDEX_NAME) {
@@ -98,15 +104,23 @@ class SearchService(
             }
         }
 
+        logger.debug { "State -> Mapped" }
+
         readyState = State.MAPPED
     }
 
     suspend fun ingest(sessions: List<Session>) {
+        logger.debug { "Ingesting" }
+
         if (readyState != State.MAPPED) {
+            logger.debug { "Incorrect search state - was $readyState" }
+
             return
         }
 
         if (!skipIndex) {
+            logger.debug { "Bulk" }
+
             val itemCallBack =
                 object : BulkItemCallBack {
                     override fun bulkRequestFailed(
@@ -150,6 +164,8 @@ class SearchService(
         } else {
             logger.info { "Indexing skipped" }
         }
+
+        logger.debug { "State -> Indexed" }
 
         readyState = State.INDEXED
     }

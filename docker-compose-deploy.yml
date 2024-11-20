@@ -10,7 +10,7 @@ services:
       - discovery.type=single-node
       - xpack.security.http.ssl.enabled=false
       - xpack.license.self_generated.type=trial
-    image: docker.elastic.co/elasticsearch/elasticsearch:8.15.1
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.16.0
     mem_limit: 1gb
     networks:
       - history
