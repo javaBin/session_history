@@ -12,6 +12,7 @@ arrow_version = "1.2.4"
 search_client_version = "2.3.1"
 kotlinx_serialization_version = "1.7.3"
 node_version = "7.1.0"
+mockk_version = "1.13.13"
 
 [libraries]
 arrow-core = { group = "io.arrow-kt", name = "arrow-core", version.ref = "arrow_version" }
@@ -35,6 +36,7 @@ ktor-client-cio = { group = "io.ktor", name = "ktor-client-cio", version.ref = "
 search-client = { group = "com.jillesvangurp", name = "search-client", version.ref = "search_client_version" }
 kotlinx-serialization = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-json", version.ref = "kotlinx_serialization_version" }
 ktor-serialization = { group = "io.ktor", name = "ktor-serialization-kotlinx-json", version.ref = "ktor_version" }
+mockk = { group = "io.mockk", name="mockk", version.ref = "mockk_version" }
 
 [bundles]
 monitoring = ["ktor-server-metrics-micrometer", "micrometer-registry-prometheus", "ktor-server-call-id", "ktor-server-call-logging"]
