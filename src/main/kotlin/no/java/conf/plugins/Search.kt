@@ -86,7 +86,7 @@ fun Application.configureSearchRouting(service: SearchService) {
             get("/videos") {
                 either {
                     service.allVideos()
-                }.respond()
+                }.respond(this)
             }
 
             post {
@@ -94,7 +94,7 @@ fun Application.configureSearchRouting(service: SearchService) {
                     service.textSearch(
                         runCatching<TextSearchRequest?> { call.receiveNullable<TextSearchRequest>() }.getOrNull()
                     )
-                }.respond()
+                }.respond(this)
             }
         }
     }
