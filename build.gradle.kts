@@ -1,7 +1,8 @@
 plugins {
     alias(libs.plugins.kotlin.jvm)
     alias(libs.plugins.ktor)
-    alias(libs.plugins.kotlinter)
+    // https://github.com/jeremymailen/kotlinter-gradle/issues/414
+    // alias(libs.plugins.kotlinter)
     alias(libs.plugins.detekt)
     alias(libs.plugins.versions)
     alias(libs.plugins.serialization)
@@ -16,6 +17,10 @@ application {
 
 kotlin {
     jvmToolchain(22)
+
+    compilerOptions {
+        freeCompilerArgs = listOf("-Xcontext-receivers")
+    }
 }
 
 repositories {
@@ -43,14 +48,6 @@ dependencies {
     testImplementation(libs.ktor.server.test.host)
     testImplementation(libs.kotlin.test.junit)
     testImplementation(libs.mockk)
-}
-
-tasks {
-    withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
-        compilerOptions {
-            freeCompilerArgs = listOf("-Xcontext-receivers")
-        }
-    }
 }
 
 tasks.shadowJar {

@@ -1,7 +1,7 @@
 
 [versions]
 ktor-version = "3.0.1"
-kotlin-version = "2.0.21"
+kotlin-version = "2.1.0"
 logback-version = "1.5.12"
 prometheus-version = "1.14.1"
 gradle_versions_filter_version = "0.1.16"
@@ -9,7 +9,7 @@ detekt_version = "1.23.7"
 kotlinter_version = "4.5.0"
 kotlin_logging_version = "7.0.0"
 arrow_version = "1.2.4"
-search_client_version = "2.3.1"
+search_client_version = "2.3.2"
 kotlinx_serialization_version = "1.7.3"
 node_version = "7.1.0"
 mockk_version = "1.13.13"
