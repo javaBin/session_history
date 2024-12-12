@@ -5,6 +5,7 @@ plugins {
     alias(libs.plugins.detekt)
     alias(libs.plugins.versions)
     alias(libs.plugins.serialization)
+    jacoco
 }
 
 group = "no.java.conf"
@@ -44,9 +45,7 @@ dependencies {
     implementation(libs.arrow.core)
     implementation(libs.kotlin.logging)
     implementation(libs.bundles.search)
-    testImplementation(libs.ktor.server.test.host)
-    testImplementation(libs.kotlin.test.junit)
-    testImplementation(libs.mockk)
+    testImplementation(libs.bundles.test)
 }
 
 tasks.shadowJar {
@@ -61,4 +60,16 @@ tasks.shadowJar {
 
 tasks.jar {
     enabled = false
+}
+
+tasks.withType<Test>().configureEach {
+    useJUnitPlatform()
+}
+
+tasks.test {
+    finalizedBy(tasks.jacocoTestReport)
+}
+
+tasks.jacocoTestReport {
+    dependsOn(tasks.test)
 }
