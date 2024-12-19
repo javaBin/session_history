@@ -1,3 +1,4 @@
-rootProject.name = "no.java.conf"
+rootProject.name = "session_history"
 
-include("frontend")
+include("index")
+include("search")
