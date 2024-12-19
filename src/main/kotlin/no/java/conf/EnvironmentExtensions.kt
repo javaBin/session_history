@@ -39,12 +39,12 @@ fun ApplicationEnvironment.searchServiceConfig(searchClient: SearchClient) =
         skipIndex = bool("elastic.skipindex")
     )
 
-fun ApplicationEnvironment.endpointConfig(key: String) =
-    config.configList(key).map {
+fun ApplicationEnvironment.endpointConfig() =
+    config.configList("javazone.sleepingpill").map {
         EndpointConfig(it.int("year"), it.str("endpoint"))
     }
 
-fun ApplicationEnvironment.localFileConfig(key: String) =
-    config.configList(key).map {
+fun ApplicationEnvironment.localFileConfig() =
+    config.configList("javazone.localfile").map {
         LocalFileConfig(it.int("year"), it.str("LocalFileConfig"))
     }

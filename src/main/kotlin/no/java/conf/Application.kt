@@ -37,8 +37,8 @@ fun Application.module() {
     val searchClient = searchClient(environment.searchClientConfig())
     val searchService = searchService(environment.searchServiceConfig(searchClient))
 
-    val sleepingPillService = sleepingPillService(httpClient(), environment.endpointConfig("javazone.sleepingpill"))
-    val localFileService = localFileService(environment.localFileConfig("javazone.localfile"))
+    val sleepingPillService = sleepingPillService(httpClient(), environment.endpointConfig())
+    val localFileService = localFileService(environment.localFileConfig())
 
     configureSerialization()
     configureMonitoring()
