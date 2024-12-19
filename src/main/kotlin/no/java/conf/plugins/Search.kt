@@ -11,70 +11,33 @@ import io.ktor.server.routing.get
 import io.ktor.server.routing.post
 import io.ktor.server.routing.route
 import io.ktor.server.routing.routing
+import no.java.conf.config.SearchClientConfig
+import no.java.conf.config.SearchServiceConfig
 import no.java.conf.model.search.TextSearchRequest
 import no.java.conf.service.SearchService
-import no.java.conf.service.search.ElasticIndexer
-import no.java.conf.service.search.ElasticIngester
-import no.java.conf.service.search.ElasticSearcher
 
 private val logger = KotlinLogging.logger {}
 
-fun searchClient(
-    host: String,
-    port: Int,
-    username: String,
-    password: String
-): SearchClient {
-    logger.info { "Connection Info: $host:$port with $username" }
+fun searchClient(config: SearchClientConfig): SearchClient {
+    logger.info { "Connection Info: $config" }
 
     return SearchClient(
         KtorRestClient(
-            host = host,
-            port = port,
-            user = username,
-            password = password,
+            host = config.host,
+            port = config.port,
+            user = config.username,
+            password = config.password,
         ),
     )
 }
 
-fun Application.searchClient() =
-    searchClient(
-        host = environment.config.property("elastic.host").getString(),
-        port =
-            environment.config
-                .property("elastic.port")
-                .getString()
-                .toInt(),
-        username = environment.config.property("elastic.username").getString(),
-        password = environment.config.property("elastic.password").getString(),
+fun searchService(config: SearchServiceConfig) =
+    SearchService(
+        indexer = config.indexer,
+        ingester = config.ingester,
+        searcher = config.searcher,
+        skipIndex = config.skipIndex,
     )
-
-fun searchService(
-    indexer: ElasticIndexer,
-    ingester: ElasticIngester,
-    searcher: ElasticSearcher,
-    skipIndex: Boolean
-) = SearchService(
-    indexer = indexer,
-    ingester = ingester,
-    searcher = searcher,
-    skipIndex = skipIndex,
-)
-
-fun Application.searchService(): SearchService {
-    val searchClient = searchClient()
-
-    return searchService(
-        indexer = ElasticIndexer(searchClient),
-        ingester = ElasticIngester(searchClient),
-        searcher = ElasticSearcher(searchClient),
-        skipIndex =
-            environment.config
-                .property("elastic.skipindex")
-                .getString()
-                .toBoolean()
-    )
-}
 
 fun Application.configureSearchRouting(service: SearchService) {
     routing {

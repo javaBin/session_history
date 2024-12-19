@@ -1,4 +1,4 @@
-package no.java.conf.model
+package no.java.conf.config
 
 data class EndpointConfig(
     val year: Int,

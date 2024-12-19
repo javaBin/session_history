@@ -1,19 +1,19 @@
 
 [versions]
-arrow_version = "1.2.4"
+arrow_version = "2.0.0"
 detekt_version = "1.23.7"
 gradle_versions_filter_version = "0.1.16"
 kotest-version = "6.0.0.M1"
 kotlin-version = "2.1.0"
-kotlin_logging_version = "7.0.0"
-kotlinter_version = "5.0.0"
+kotlin_logging_version = "7.0.3"
+kotlinter_version = "5.0.1"
 kotlinx_serialization_version = "1.7.3"
-ktor-version = "3.0.1"
+ktor-version = "3.0.2"
 logback-version = "1.5.12"
 mockk_version = "1.13.13"
 node_version = "7.1.0"
-prometheus-version = "1.14.1"
-search_client_version = "2.3.2"
+prometheus-version = "1.14.2"
+search_client_version = "2.3.3"
 
 [libraries]
 arrow-core = { group = "io.arrow-kt", name = "arrow-core", version.ref = "arrow_version" }

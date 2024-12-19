@@ -3,16 +3,12 @@ package no.java.conf.service
 import io.github.oshai.kotlinlogging.KotlinLogging
 import io.ktor.client.request.get
 import kotlinx.serialization.json.Json
+import no.java.conf.config.LocalFileConfig
 import no.java.conf.model.sessions.Session
 import no.java.conf.model.sleepingpill.SPSessions
 import no.java.conf.model.sleepingpill.toSession
 
 private val logger = KotlinLogging.logger {}
-
-data class LocalFileConfig(
-    val year: Int,
-    val filename: String
-)
 
 class LocalFileService(
     private val filenames: List<LocalFileConfig>

@@ -43,7 +43,7 @@ fun Application.configureMonitoring() {
         }
     }
     routing {
-        get("/metrics-micrometer") {
+        get("/metrics") {
             call.respond(appMicrometerRegistry.scrape())
         }
     }

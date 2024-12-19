@@ -7,7 +7,7 @@ import io.ktor.client.request.get
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
-import no.java.conf.model.EndpointConfig
+import no.java.conf.config.EndpointConfig
 import no.java.conf.model.sessions.Session
 import no.java.conf.model.sleepingpill.SPSession
 import no.java.conf.model.sleepingpill.SPSessions
