@@ -38,7 +38,6 @@ private val logger = KotlinLogging.logger {}
 class ElasticSearcher(
     private val client: SearchClient,
 ) {
-    context(Raise<ApiError>)
     suspend fun allVideos(indexName: String): List<VideoSearchResponse> {
         val docCount = client.totalDocs(indexName)
 
@@ -51,10 +50,10 @@ class ElasticSearcher(
         return sessions.parseHits<VideoSearchResponse>().sortedBy { -it.year }
     }
 
-    context(Raise<ApiError>)
     suspend fun textSearch(
         indexName: String,
-        searchRequest: TextSearchRequest
+        searchRequest: TextSearchRequest,
+        raise: Raise<ApiError>
     ): SearchResponse {
         val docCount = client.totalDocs(indexName)
 
@@ -69,8 +68,8 @@ class ElasticSearcher(
                 logger.debug { this.json() }
             }
 
-        ensure(searchResult.aggregations != null) {
-            raise(AggregationsNotFound)
+        raise.ensure(searchResult.aggregations != null) {
+            raise.raise(AggregationsNotFound)
         }
 
         return SearchResponse(

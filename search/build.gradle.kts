@@ -17,10 +17,6 @@ application {
 
 kotlin {
     jvmToolchain(22)
-
-    compilerOptions {
-        freeCompilerArgs = listOf("-Xcontext-receivers")
-    }
 }
 
 repositories {

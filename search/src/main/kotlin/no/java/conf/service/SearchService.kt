@@ -78,24 +78,25 @@ class SearchService(
         readyState = State.INDEXED
     }
 
-    context(Raise<ApiError>)
-    suspend fun allVideos(): List<VideoSearchResponse> {
-        ensureReady(readyState)
+    suspend fun allVideos(raise: Raise<ApiError>): List<VideoSearchResponse> {
+        raise.ensureReady(readyState)
 
         return searcher.allVideos(INDEX_NAME)
     }
 
     fun state(): State = readyState
 
-    context(Raise<ApiError>)
-    suspend fun textSearch(searchRequest: TextSearchRequest?): SearchResponse {
-        ensureNotNull(searchRequest) {
-            raise(SearchMissing)
+    suspend fun textSearch(
+        searchRequest: TextSearchRequest?,
+        raise: Raise<ApiError>
+    ): SearchResponse {
+        raise.ensureNotNull(searchRequest) {
+            raise.raise(SearchMissing)
         }
 
-        ensureReady(readyState)
+        raise.ensureReady(readyState)
 
-        return searcher.textSearch(INDEX_NAME, searchRequest)
+        return searcher.textSearch(INDEX_NAME, searchRequest, raise)
     }
 }
 

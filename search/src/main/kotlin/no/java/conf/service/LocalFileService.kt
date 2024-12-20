@@ -1,7 +1,6 @@
 package no.java.conf.service
 
 import io.github.oshai.kotlinlogging.KotlinLogging
-import io.ktor.client.request.get
 import kotlinx.serialization.json.Json
 import no.java.conf.config.LocalFileConfig
 import no.java.conf.model.sessions.Session
@@ -27,7 +26,7 @@ class LocalFileService(
         sessions =
             filenames
                 .map {
-                    val fileContent = javaClass.getResource(it.filename).readText()
+                    val fileContent = javaClass.getResource(it.filename)?.readText() ?: "[]"
 
                     val decodedSessions = json.decodeFromString<SPSessions>(fileContent)
 

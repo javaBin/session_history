@@ -48,14 +48,15 @@ fun Application.configureSearchRouting(service: SearchService) {
 
             get("/videos") {
                 either {
-                    service.allVideos()
+                    service.allVideos(this)
                 }.respond(this)
             }
 
             post {
                 either {
                     service.textSearch(
-                        runCatching<TextSearchRequest?> { call.receiveNullable<TextSearchRequest>() }.getOrNull()
+                        runCatching<TextSearchRequest?> { call.receiveNullable<TextSearchRequest>() }.getOrNull(),
+                        this
                     )
                 }.respond(this)
             }
