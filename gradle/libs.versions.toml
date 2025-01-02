@@ -1,18 +1,18 @@
 
 [versions]
 arrow_version = "2.0.0"
+dependency_analysis_version = "2.6.1"
 detekt_version = "1.23.7"
 gradle_versions_filter_version = "0.1.16"
-kotest-version = "6.0.0.M1"
-kotlin-version = "2.1.0"
+kotest_version = "6.0.0.M1"
+kotlin_version = "2.1.0"
 kotlin_logging_version = "7.0.3"
 kotlinter_version = "5.0.1"
 kotlinx_serialization_version = "1.7.3"
-ktor-version = "3.0.3"
-logback-version = "1.5.13"
+ktor_version = "3.0.3"
+logback_version = "1.5.13"
 mockk_version = "1.13.13"
-node_version = "7.1.0"
-prometheus-version = "1.14.2"
+prometheus_version = "1.14.2"
 search_client_version = "2.3.3"
 
 [libraries]
@@ -25,23 +25,22 @@ ktor-client-content-negotiation = { group = "io.ktor", name = "ktor-client-conte
 ktor-client-core = { group = "io.ktor", name = "ktor-client-core", version.ref = "ktor_version" }
 ktor-client-logging = { group = "io.ktor", name = "ktor-client-logging", version.ref = "ktor_version" }
 ktor-serialization = { group = "io.ktor", name = "ktor-serialization-kotlinx-json", version.ref = "ktor_version" }
-ktor-server-call-id = { module = "io.ktor:ktor-server-call-id-jvm", version.ref = "ktor-version" }
-ktor-server-call-logging = { module = "io.ktor:ktor-server-call-logging-jvm", version.ref = "ktor-version" }
-ktor-server-cio = { module = "io.ktor:ktor-server-cio-jvm", version.ref = "ktor-version" }
-ktor-server-content-negotiation = { module = "io.ktor:ktor-server-content-negotiation-jvm", version.ref = "ktor-version" }
-ktor-server-core = { module = "io.ktor:ktor-server-core-jvm", version.ref = "ktor-version" }
-ktor-server-host-common = { module = "io.ktor:ktor-server-host-common-jvm", version.ref = "ktor-version" }
-ktor-server-metrics-micrometer = { module = "io.ktor:ktor-server-metrics-micrometer-jvm", version.ref = "ktor-version" }
-ktor-server-status-pages = { module = "io.ktor:ktor-server-status-pages-jvm", version.ref = "ktor-version" }
-logback-classic = { module = "ch.qos.logback:logback-classic", version.ref = "logback-version" }
-micrometer-registry-prometheus = { module = "io.micrometer:micrometer-registry-prometheus", version.ref = "prometheus-version" }
+ktor-server-call-id = { module = "io.ktor:ktor-server-call-id-jvm", version.ref = "ktor_version" }
+ktor-server-call-logging = { module = "io.ktor:ktor-server-call-logging-jvm", version.ref = "ktor_version" }
+ktor-server-cio = { module = "io.ktor:ktor-server-cio-jvm", version.ref = "ktor_version" }
+ktor-server-content-negotiation = { module = "io.ktor:ktor-server-content-negotiation-jvm", version.ref = "ktor_version" }
+ktor-server-core = { module = "io.ktor:ktor-server-core-jvm", version.ref = "ktor_version" }
+ktor-server-metrics-micrometer = { module = "io.ktor:ktor-server-metrics-micrometer-jvm", version.ref = "ktor_version" }
+ktor-server-status-pages = { module = "io.ktor:ktor-server-status-pages-jvm", version.ref = "ktor_version" }
+logback-classic = { module = "ch.qos.logback:logback-classic", version.ref = "logback_version" }
+micrometer-registry-prometheus = { module = "io.micrometer:micrometer-registry-prometheus", version.ref = "prometheus_version" }
 search-client = { group = "com.jillesvangurp", name = "search-client", version.ref = "search_client_version" }
 
-ktor-server-test-host = { module = "io.ktor:ktor-server-test-host-jvm", version.ref = "ktor-version" }
-kotlin-test-junit = { module = "org.jetbrains.kotlin:kotlin-test-junit", version.ref = "kotlin-version" }
-kotest = { module = "io.kotest:kotest-runner-junit5", version.ref = "kotest-version" }
-kotest-assertions = { module = "io.kotest:kotest-assertions-core", version.ref = "kotest-version" }
-ktor-client-mock = { module = "io.ktor:ktor-client-mock", version.ref = "ktor-version" }
+ktor-server-test-host = { module = "io.ktor:ktor-server-test-host-jvm", version.ref = "ktor_version" }
+kotlin-test-junit = { module = "org.jetbrains.kotlin:kotlin-test-junit", version.ref = "kotlin_version" }
+kotest = { module = "io.kotest:kotest-runner-junit5", version.ref = "kotest_version" }
+kotest-assertions = { module = "io.kotest:kotest-assertions-core", version.ref = "kotest_version" }
+ktor-client-mock = { module = "io.ktor:ktor-client-mock", version.ref = "ktor_version" }
 mockk = { group = "io.mockk", name="mockk", version.ref = "mockk_version" }
 
 [bundles]
@@ -49,13 +48,13 @@ monitoring = ["ktor-server-metrics-micrometer", "micrometer-registry-prometheus"
 ktor-client = ["ktor-client-content-negotiation",  "ktor-client-core", "ktor-client-logging", "ktor-client-cio"]
 serialization = ["ktor-serialization","kotlinx-serialization"]
 search = ["search-client"]
-test = ["ktor-server-test-host", "kotlin-test-junit", "kotest", "kotest-assertions", "ktor-client-mock", "mockk"]
+test = ["ktor-server-test-host", "kotest", "kotest-assertions", "ktor-client-mock", "mockk"]
 
 [plugins]
-kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin-version" }
-ktor = { id = "io.ktor.plugin", version.ref = "ktor-version" }
-kotlinter = { id = "org.jmailen.kotlinter", version.ref = "kotlinter_version" }
+dependency-analysis = { id = "com.autonomousapps.dependency-analysis", version.ref = "dependency_analysis_version" }
 detekt = { id = "io.gitlab.arturbosch.detekt", version.ref = "detekt_version" }
-versions = { id = "se.ascp.gradle.gradle-versions-filter", version.ref = "gradle_versions_filter_version" }
+kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin_version" }
+kotlinter = { id = "org.jmailen.kotlinter", version.ref = "kotlinter_version" }
+ktor = { id = "io.ktor.plugin", version.ref = "ktor_version" }
 serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin_version" }
-node = { id = "com.github.node-gradle.node", version.ref = "node_version" }
+versions = { id = "se.ascp.gradle.gradle-versions-filter", version.ref = "gradle_versions_filter_version" }

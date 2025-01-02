@@ -5,6 +5,7 @@ plugins {
     alias(libs.plugins.detekt)
     alias(libs.plugins.versions)
     alias(libs.plugins.serialization)
+    alias(libs.plugins.dependency.analysis)
     jacoco
 }
 
@@ -29,19 +30,19 @@ repositories {
 }
 
 dependencies {
-    implementation(libs.ktor.server.core)
-    implementation(libs.ktor.server.host.common)
-    implementation(libs.ktor.server.status.pages)
+    implementation(libs.arrow.core)
+    implementation(libs.bundles.ktor.client)
+    implementation(libs.bundles.monitoring)
+    implementation(libs.bundles.search)
+    implementation(libs.bundles.serialization)
+    implementation(libs.kotlin.logging)
     implementation(libs.ktor.server.cio)
     implementation(libs.ktor.server.content.negotiation)
-    implementation(libs.logback.classic)
-    implementation(libs.bundles.monitoring)
-    implementation(libs.bundles.serialization)
-    implementation(libs.bundles.ktor.client)
-    implementation(libs.arrow.core)
-    implementation(libs.kotlin.logging)
-    implementation(libs.bundles.search)
+    implementation(libs.ktor.server.core)
+    implementation(libs.ktor.server.status.pages)
+    runtimeOnly(libs.logback.classic)
     testImplementation(libs.bundles.test)
+    testRuntimeOnly(libs.kotlin.test.junit)
 }
 
 tasks.shadowJar {
